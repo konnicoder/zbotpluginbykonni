@@ -36,35 +36,40 @@ public class TaskGoldfarm extends Task {
     private static final Location GOLD_INGOT_TESS_WALK = new Location(299, 137, -8714).centerHorizontally();
     private static final Location GOLD_INGOT_TESS_LOC = new Location(300, 138, -8714).centerHorizontally();
 
+    private static final Location FEATHER_CHEST_WALK = new Location(296, 133, -8716).centerHorizontally();
+    private static final Location FEATHER_CHEST_LOC = new Location(296, 132, -8716).centerHorizontally();
+    private static final Location FEATHER_TESS_WALK = new Location(299, 137, -8717).centerHorizontally();
+    private static final Location FEATHER_TESS_LOC = new Location(300, 138, -8717).centerHorizontally();
+
     private static final HashSet<Material> TRASH_MATERIALS = new HashSet<>();
+    
     private static boolean playerPresent = true;
     private static boolean grinding = false;
     private static boolean shulkerempty = false;
     private static boolean daily = true;
     private static int nuggettransfer = 0;
     private static int goldingottransfer = 0;
-
+    private static int grd = 0;
+    private static int grinds = Main.config.getInt("grinds", 0);
+    
     public TaskGoldfarm() {
         super(100);
     }
 
     public void run() {
 
-        int grinds = Main.config.getInt("grinds", 0);
         try {
 
             while (daily) {
-                int grd = 0;
 
                 grinding = true;
                 ai.tick();
                 Main.self.selectSlot(1);
                 if (Main.self.getLocation().distanceTo(home) > 0.1) {
                     ai.moveTo(home);
-                }
+                }               
                 while (grinding) {
                     grindpigmen();
-                    grd++;
                     System.out.println(grd);
 
                     if (grd >= grinds) {
@@ -107,12 +112,15 @@ public class TaskGoldfarm extends Task {
         daily = false;
         grinding = false;
         shulkerempty = false;
+        Main.self.sendChat("I transfered " + nuggettransfer + " goldnuggets and " + goldingottransfer + " goldingots into tesseracts.");
     }
 
     public void serviceoutput() throws InterruptedException {
         serviceChest(GOLD_INGOT_CHEST_WALK, GOLD_INGOT_CHEST_LOC, GOLD_INGOT_TESS_WALK, GOLD_INGOT_TESS_LOC);
         ai.tick();
-        
+        serviceChest(FEATHER_CHEST_WALK, FEATHER_CHEST_LOC, FEATHER_TESS_WALK, FEATHER_TESS_LOC);
+        ai.tick();
+
     }
 
     public void serviceChest(Location walkchest, Location chestloc, Location tesswalk, Location tessloc) throws InterruptedException {
@@ -250,6 +258,7 @@ public class TaskGoldfarm extends Task {
         //System.out.println("press button");
         ai.tick(3);
         Main.self.placeBlock(BUTTON_LOC, BlockFace.EAST);
+        grd++;
         ai.tick(5);
     }
 
