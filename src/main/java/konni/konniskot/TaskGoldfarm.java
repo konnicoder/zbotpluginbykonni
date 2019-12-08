@@ -43,6 +43,7 @@ public class TaskGoldfarm extends Task {
     private static boolean daily = true;
     private static int nuggettransfer = 0;
     private static int goldingottransfer = 0;
+
     public TaskGoldfarm() {
         super(100);
     }
@@ -109,24 +110,30 @@ public class TaskGoldfarm extends Task {
     }
 
     public void serviceoutput() throws InterruptedException {
-        ai.moveTo(GOLD_INGOT_CHEST_WALK);
+        serviceChest(GOLD_INGOT_CHEST_WALK, GOLD_INGOT_CHEST_LOC, GOLD_INGOT_TESS_WALK, GOLD_INGOT_TESS_LOC);
+        ai.tick();
+        
+    }
+
+    public void serviceChest(Location walkchest, Location chestloc, Location tesswalk, Location tessloc) throws InterruptedException {
+        System.out.println("service chest");
+        ai.moveTo(walkchest);
         ai.tick(3);
-        ai.openContainer(GOLD_INGOT_CHEST_LOC);
-        ai.tick(5);
+        ai.openContainer(chestloc);
+        ai.tick(3);
         emptyChest();
         ai.tick();
         ai.closeContainer();
         ai.tick(3);
         Main.self.sendChat("/home xp");
         ai.tick(5);
-        ai.moveTo(GOLD_INGOT_TESS_WALK);
+        ai.moveTo(tesswalk);
         ai.tick();
         Main.self.sneak(true);
         ai.tick();
-        Main.self.placeBlock(GOLD_INGOT_TESS_LOC, BlockFace.EAST);
+        Main.self.placeBlock(tessloc, BlockFace.EAST);
         ai.tick();
         Main.self.sneak(false);
-
     }
 
     public void checkshulkers() throws InterruptedException {
