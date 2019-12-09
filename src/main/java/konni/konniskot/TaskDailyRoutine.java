@@ -15,7 +15,7 @@ import zedly.zbot.entity.Entity;
  *
  * @author Konstantin
  */
-public class TaskGoldfarm extends Task {
+public class TaskDailyRoutine extends Task {
 
     private static final Location home = new Location(295, 137, -8702).centerHorizontally();
     private static final Location BUTTON_LOC = new Location(293, 138, -8702).centerHorizontally();
@@ -46,17 +46,19 @@ public class TaskGoldfarm extends Task {
 
     private static final HashSet<Material> TRASH_MATERIALS = new HashSet<>();
 
-    private static boolean playerPresent = true;
+    private static boolean playerPresent = false;
     private static boolean grinding = false;
     private static boolean shulkerempty = false;
     private static boolean goldfarmrun = true;
+    private static boolean daily = true;
     private static int nuggettransfer = 0;
     private static int goldingottransfer = 0;
     private static int grd;
     private static int grinds = Main.config.getInt("grinds", 0);
     private static double coallevel;
+    private static int goldfarmruns;
 
-    public TaskGoldfarm() {
+    public TaskDailyRoutine() {
         super(100);
     }
 
@@ -64,46 +66,12 @@ public class TaskGoldfarm extends Task {
 
         try {
 
-            while (goldfarmrun) {
-                grd = 0;
-                grinding = true;
-                ai.tick();
-                Main.self.selectSlot(1);
-                if (Main.self.getLocation().distanceTo(home) > 0.1) {
-                    ai.moveTo(home);
+            while (daily) {
+                goldfarmruns =0;
+                while (goldfarmruns <= 5){
+                goldfarm();
+                goldfarmruns++;
                 }
-                while (grinding) {
-                    grindpigmen();
-                    System.out.println(grd);
-
-                    if (grd >= grinds) {
-                        grinding = false;
-                        System.out.println("done grinding");
-                    }
-                }
-                ai.tick(2);
-                //Trashcan start
-                ai.moveTo(TRASH_WALK_LOC);
-                ai.tick(20);
-                System.out.println("wait done, deposit trash");
-                dumpTrash();
-                shulkerempty = true;
-                //Trashcan end
-
-                ai.tick();
-                ai.moveTo(SHULKER_WALK);
-                ai.tick(2);
-                checkshulkers();
-
-                while (shulkerempty) {
-                    shulkers();
-                    ai.tick();
-                    System.out.println(nuggettransfer);
-                }
-                ai.tick();
-                serviceoutput();
-                ai.tick();
-                Main.self.sendChat("/msg ImakeYourBedrock " + nuggettransfer);
             }
 
         } catch (InterruptedException ehmm) {
@@ -112,7 +80,51 @@ public class TaskGoldfarm extends Task {
 
     }
 
+    public void goldfarm() throws InterruptedException {
+        grd = 0;
+        grinding = true;
+        ai.tick();
+        Main.self.selectSlot(1);
+        if (Main.self.getLocation().distanceTo(home) > 0.1) {
+            ai.moveTo(home);
+        }
+        while (grinding) {
+            grindpigmen();
+            System.out.println(grd);
+
+            if (grd >= grinds) {
+                grinding = false;
+                System.out.println("done grinding");
+            }
+        }
+        ai.tick(2);
+        //Trashcan start
+        ai.moveTo(TRASH_WALK_LOC);
+        ai.tick(20);
+        System.out.println("wait done, deposit trash");
+        dumpTrash();
+        shulkerempty = true;
+        //Trashcan end
+
+        ai.tick();
+        ai.moveTo(SHULKER_WALK);
+        ai.tick(2);
+        checkshulkers();
+
+        while (shulkerempty) {
+            shulkers();
+            ai.tick();
+            System.out.println(nuggettransfer);
+        }
+        ai.tick();
+        serviceoutput();
+        ai.tick();
+        Main.self.sendChat("/msg ImakeYourBedrock " + nuggettransfer);
+
+    }
+
     public void cancel() {
+        daily = false;
         goldfarmrun = false;
         grinding = false;
         shulkerempty = false;

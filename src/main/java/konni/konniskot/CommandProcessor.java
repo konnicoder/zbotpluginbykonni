@@ -21,6 +21,7 @@ class CommandProcessor {
     private static TaskGrindpigmen pigmentask;
     private static TaskShulkerleeren shulkerrun;
     private static TaskGoldfarm goldfarm;
+    private static TaskDailyRoutine dailyroutine;
     private static final File scrambleComplimentFile = new File(Main.instance.getDataFolder(), "compliments.txt");
     private static final ArrayList<String> compliments = new ArrayList<>();
 
@@ -90,6 +91,11 @@ class CommandProcessor {
                 } else {
                     System.out.println("Task läuft nicht");
                 }
+                break;
+                
+            case "daily_routine":
+              dailyroutine = new TaskDailyRoutine(); 
+              dailyroutine.start();
                 break;
 
             case "daily":
