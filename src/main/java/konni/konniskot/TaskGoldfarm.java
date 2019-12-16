@@ -41,8 +41,8 @@ public class TaskGoldfarm extends Task {
     private static final Location FEATHER_TESS_WALK = new Location(299, 137, -8717).centerHorizontally();
     private static final Location FEATHER_TESS_LOC = new Location(300, 138, -8717).centerHorizontally();
 
-    private static final Location COAL_CHEST_WALK = new Location(301, 131, -8716).centerHorizontally();
-    private static final Location COAL_CHEST_LOC = new Location(301, 133, -8717).centerHorizontally();
+    private static final Location COAL_CHEST_WALK = new Location(300, 132, -8716).centerHorizontally();
+    private static final Location COAL_CHEST_LOC = new Location(300, 132, -8717).centerHorizontally();
 
     private static final HashSet<Material> TRASH_MATERIALS = new HashSet<>();
 
@@ -131,12 +131,15 @@ public class TaskGoldfarm extends Task {
         coallevel = InventoryUtil.count(Material.CHARCOAL, false, true);
         coallevel = coallevel / 3456;
         coallevel = coallevel * 100;
+        if (coallevel <= 10){
+        Main.self.sendChat("warning, coallevel at goldfarm is low!");
+        }
         ai.tick();
         ai.closeContainer();
         ai.tick();
         System.out.println(coallevel);
         ai.tick();
-        Main.self.sendChat("/msg Konni999 coallevel at goldfarm ist at " + coallevel + "%");
+        Main.self.sendChat("coallevel at goldfarm ist at " + coallevel + "%");
 
         ai.tick();
     }

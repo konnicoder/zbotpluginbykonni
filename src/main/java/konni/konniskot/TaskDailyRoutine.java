@@ -9,6 +9,7 @@ import zedly.zbot.BlockFace;
 import zedly.zbot.EntityType;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
+import zedly.zbot.block.TileSign;
 import zedly.zbot.entity.Entity;
 
 /**
@@ -41,21 +42,32 @@ public class TaskDailyRoutine extends Task {
     private static final Location FEATHER_TESS_WALK = new Location(299, 137, -8717).centerHorizontally();
     private static final Location FEATHER_TESS_LOC = new Location(300, 138, -8717).centerHorizontally();
 
-    private static final Location COAL_CHEST_WALK = new Location(301, 131, -8716).centerHorizontally();
-    private static final Location COAL_CHEST_LOC = new Location(301, 133, -8717).centerHorizontally();
+    private static final Location COAL_CHEST_WALK = new Location(299, 132, -8717).centerHorizontally();
+    private static final Location COAL_CHEST_LOC = new Location(300, 132, -8717).centerHorizontally();
+
+    private static final Location KELP_INPUT_WALK = new Location(255, 137, -8603).centerHorizontally();
+    private static final Location KELP_INPUT_TESS = new Location(256, 138, -8603).centerHorizontally();
+    private static final Location KELP_CRAFTING_WALK = new Location(255, 137, -8602).centerHorizontally();
+    private static final Location KELP_CRAFTING_LOC = new Location(257, 138, -8602).centerHorizontally();
+    private static final Location KELP_OUTPUT_WALK = new Location(255, 137, -8604).centerHorizontally();
+    private static final Location KELP_OUTPUT_TESS = new Location(256, 138, -8604).centerHorizontally();
+    private static final Location KELP_OUTPUT_CHEST = new Location(255, 137, -8601).centerHorizontally();
+    private static final Location waypoint1 = new Location(229, 137, -8711).centerHorizontally();
+    private static final Location waypoint2 = new Location(229, 137, -8631).centerHorizontally();
+    private static final Location signloc = new Location(256, 138, -8604).centerHorizontally();
 
     private static final HashSet<Material> TRASH_MATERIALS = new HashSet<>();
+    private static final HashSet<Material> Fuel = new HashSet<>();
 
     private static boolean playerPresent = false;
     private static boolean grinding = false;
     private static boolean shulkerempty = false;
-    private static boolean goldfarmrun = true;
     private static boolean daily = true;
     private static int nuggettransfer = 0;
     private static int goldingottransfer = 0;
     private static int grd;
     private static int grinds = Main.config.getInt("grinds", 0);
-    private static double coallevel;
+    private static double fuellevel;
     private static int goldfarmruns;
 
     public TaskDailyRoutine() {
@@ -65,12 +77,13 @@ public class TaskDailyRoutine extends Task {
     public void run() {
 
         try {
-
+            Main.self.sendChat("/home xp");
+            ai.tick(5);
             while (daily) {
-                goldfarmruns =0;
-                while (goldfarmruns <= 5){
-                goldfarm();
-                goldfarmruns++;
+                goldfarmruns = 0;
+                while (goldfarmruns <= 5) {
+                    goldfarm();
+                    goldfarmruns++;
                 }
             }
 
@@ -78,6 +91,77 @@ public class TaskDailyRoutine extends Task {
         }
         unregister();
 
+    }
+
+    public void craftKelpBlocks(int repeats) throws InterruptedException {
+        for (int i = 0; i < repeats; i++) {
+            ai.tick();
+            craftBlock(Material.DRIED_KELP, KELP_CRAFTING_WALK, KELP_CRAFTING_LOC, KELP_INPUT_TESS, KELP_INPUT_WALK, KELP_OUTPUT_TESS, KELP_OUTPUT_WALK);
+            ai.tick();
+            System.out.println("done crafting");
+
+            ai.moveTo(KELP_INPUT_WALK);
+            ai.tick(3);
+            Main.self.sneak(true);
+            ai.tick();
+            Main.self.placeBlock(KELP_INPUT_TESS, BlockFace.EAST);
+            ai.tick();
+            Main.self.sneak(false);
+        }
+
+    }
+
+    public void storeKelp() throws InterruptedException {
+        ai.moveTo(KELP_CRAFTING_LOC);
+        ai.openContainer(KELP_OUTPUT_CHEST);
+        ai.tick();
+        emptyChest();
+        ai.tick();
+        ai.closeContainer();
+        ai.tick();
+        ai.moveTo(KELP_INPUT_WALK);
+        ai.tick(3);
+        Main.self.sneak(true);
+        ai.tick();
+        Main.self.placeBlock(KELP_INPUT_TESS, BlockFace.EAST);
+        ai.tick();
+        Main.self.sneak(false);
+
+    }
+
+    public void craftBlock(Material matin, Location walkcraft, Location craftingbench, Location inputtess, Location walkinput, Location outputtess, Location walkoutput) throws InterruptedException {
+        ai.moveTo(walkinput);
+        ai.tick();
+        while (InventoryUtil.count(matin, true, false) < 9 * 64) {
+            Main.self.clickBlock(inputtess);
+            ai.tick(3);
+        }
+        ai.moveTo(walkcraft);
+
+        ai.openContainer(craftingbench);
+        int staticOffset = Main.self.getInventory().getStaticOffset();
+        for (int crafting = 1; crafting <= 9; crafting++) {
+            for (int local = staticOffset; local < staticOffset + 36; local++) {
+                if (Main.self.getInventory().getSlot(local) != null
+                        && Main.self.getInventory().getSlot(local).getType() == matin) {
+                    ai.transferItem(local, crafting);
+                    System.out.println("MIAUUUU " + local + " " + crafting);
+
+                    ai.tick(2);
+                    break;
+                }
+            }
+        }
+        Main.self.getInventory().click(0, 1, 0);
+        ai.closeContainer();
+
+        ai.moveTo(walkoutput);
+        ai.tick(3);
+        Main.self.sneak(true);
+        ai.tick();
+        Main.self.placeBlock(outputtess, BlockFace.EAST);
+        ai.tick();
+        Main.self.sneak(false);
     }
 
     public void goldfarm() throws InterruptedException {
@@ -125,7 +209,6 @@ public class TaskDailyRoutine extends Task {
 
     public void cancel() {
         daily = false;
-        goldfarmrun = false;
         grinding = false;
         shulkerempty = false;
         Main.self.sendChat("I transfered " + nuggettransfer + " goldnuggets and " + goldingottransfer + " goldingots into tesseracts.");
@@ -140,16 +223,54 @@ public class TaskDailyRoutine extends Task {
         ai.tick();
         ai.openContainer(COAL_CHEST_LOC);
         ai.tick();
-        coallevel = InventoryUtil.count(Material.CHARCOAL, false, true);
-        coallevel = coallevel / 3456;
-        coallevel = coallevel * 100;
+        fuellevel = InventoryUtil.count(Material.DRIED_KELP_BLOCK, false, true);
+        fuellevel = fuellevel / 3456;
+        fuellevel = fuellevel * 100;
         ai.tick();
         ai.closeContainer();
         ai.tick();
-        System.out.println(coallevel);
+        System.out.println(fuellevel);
         ai.tick();
-        Main.self.sendChat("/msg Konni999 coallevel at goldfarm ist at " + coallevel + "%");
+        Main.self.sendChat("/msg Konni999 fuellevel at goldfarm ist at " + fuellevel + "%");
+        if (fuellevel < 20) {
+            System.out.println("Fuellevel low: " + fuellevel + "getting fuel...");
+            if (Main.self.getLocation().distanceTo(KELP_CRAFTING_LOC) > 10) {
+                System.out.println("Fuellevel low: " + fuellevel + "getting fuel...");
+                getkelp();
+            }
+        } else {
+            System.out.println("Fuellevel O.K.: " + fuellevel);
+        }
 
+        ai.tick();
+    }
+
+    public void getkelp() throws InterruptedException {
+        Main.self.sendChat("/home xp");
+        ai.tick(5);
+        ai.moveTo(waypoint1);
+        ai.tick(5);
+        ai.moveTo(waypoint2);
+        ai.tick(5);
+        ai.moveTo(KELP_INPUT_WALK);
+        while (InventoryUtil.countFreeStorageSlots(true, false) >= 1) {
+            ai.clickBlock(KELP_OUTPUT_TESS);
+            ai.tick(3);
+        }
+
+        Main.self.sendChat("/home xp");
+        ai.tick(5);
+        ai.moveTo(COAL_CHEST_WALK);
+        ai.tick();
+        ai.openContainer(COAL_CHEST_LOC);
+
+        for (int slot = 54; slot <= 89; slot++) {
+            if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == Material.DRIED_KELP_BLOCK) {
+                ai.depositSlot(slot);
+                ai.tick();
+            }
+        }
+        ai.closeContainer();
         ai.tick();
     }
 
@@ -374,5 +495,6 @@ public class TaskDailyRoutine extends Task {
         TRASH_MATERIALS.add(Material.GOLDEN_SWORD);
         TRASH_MATERIALS.add(Material.CHICKEN);
         TRASH_MATERIALS.add(Material.FEATHER);
+        Fuel.add(Material.DRIED_KELP_BLOCK);
     }
 }

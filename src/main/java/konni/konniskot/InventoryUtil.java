@@ -75,6 +75,16 @@ public class InventoryUtil {
         }
         return count;
     }
+    
+    public static int countFullStacks(Material mat, int totalslots) {
+        int fullstacks = 0;
+        for (int slot = 0; slot <= totalslots; slot++) {
+            if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat && Main.self.getInventory().getSlot(slot).getAmount() == 64) {
+                fullstacks++;
+            }
+        }
+        return fullstacks;
+    }
 
     public static int findFreeStorageSlot(boolean staticInv) {
         int staticStart = Main.self.getInventory().getStaticOffset();

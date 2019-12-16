@@ -46,12 +46,12 @@ class CommandProcessor {
             case "lil":
                 Main.self.sendChat("give me dah weed!");
                 break;
-                
+
             case "compliment":
                 String comp = compliments.get(Main.rnd.nextInt(compliments.size()));
                 Main.self.sendChat(comp);
                 break;
-                
+
             case "afk":
                 Main.self.sendChat("/afk");
                 break;
@@ -63,10 +63,18 @@ class CommandProcessor {
         }
         switch (args[0]) {
 
+            case "readsign":
+                new TaskReadSign().start();
+                break;
+                
             case "1":
                 Main.self.sendChat("1");
                 break;
-                
+
+            case "kelp":
+                new TaskCraftKelpBlocks().start();
+                break;
+
             case "trash":
                 new TaskTrashcan().start();
                 break;
@@ -74,7 +82,7 @@ class CommandProcessor {
             case "xp":
                 Main.self.sendChat("/home xp");
                 break;
-                
+
             case "testt":
                 new TaskFixfarm().start();
                 break;
@@ -92,10 +100,10 @@ class CommandProcessor {
                     System.out.println("Task läuft nicht");
                 }
                 break;
-                
+
             case "daily_routine":
-              dailyroutine = new TaskDailyRoutine(); 
-              dailyroutine.start();
+                dailyroutine = new TaskDailyRoutine();
+                dailyroutine.start();
                 break;
 
             case "daily":
@@ -106,12 +114,12 @@ class CommandProcessor {
             case "button":
                 new TaskButtonpress().start();
                 break;
-                
+
             case "gold":
                 goldfarm = new TaskGoldfarm();
                 goldfarm.start();
                 break;
-                
+
             case "gold_stop":
                 if (goldfarm != null) {
                     goldfarm.cancel();
