@@ -31,12 +31,14 @@ class CommandProcessor {
 
         switch (args[0]) {
 
-            case "hallo":
-                Main.self.sendChat("Hallo " + user + ", nice to meet you!");
+            case "repeat":
+
+                new TaskTest().start();
+
                 break;
 
-            case "Test":
-                Main.self.sendChat("This is Konnis first programming session");
+            case "hallo":
+                Main.self.sendChat("Hallo " + user + ", nice to meet you!");
                 break;
 
             case "mario":
@@ -63,10 +65,12 @@ class CommandProcessor {
         }
         switch (args[0]) {
 
+            
+
             case "readsign":
                 new TaskReadSign().start();
                 break;
-                
+
             case "1":
                 Main.self.sendChat("1");
                 break;
@@ -83,7 +87,7 @@ class CommandProcessor {
                 Main.self.sendChat("/home xp");
                 break;
 
-            case "testt":
+            case "test":
                 new TaskFixfarm().start();
                 break;
 
@@ -141,6 +145,17 @@ class CommandProcessor {
                     System.out.println("stopped TaskGoldcraften");
                 } else {
                     System.out.println("Task läuft nicht");
+                }
+                break;
+
+            case "concrete":
+                if (args.length == 1) {
+                    Main.self.sendChat("(prefix) concrete (colour) (amount)");
+                }
+                if (args.length == 3) {
+                    int stacks = Integer.parseInt(args[2]);
+                    String block = args[1];
+                    new TaskConcrete(block, stacks).start();
                 }
                 break;
         }

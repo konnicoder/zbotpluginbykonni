@@ -76,9 +76,9 @@ public class InventoryUtil {
         return count;
     }
     
-    public static int countFullStacks(Material mat, int totalslots) {
+    public static int countFullStacks(Material mat,int startslot, int endslot) {
         int fullstacks = 0;
-        for (int slot = 0; slot <= totalslots; slot++) {
+        for (int slot = startslot; slot <= endslot; slot++) {
             if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat && Main.self.getInventory().getSlot(slot).getAmount() == 64) {
                 fullstacks++;
             }

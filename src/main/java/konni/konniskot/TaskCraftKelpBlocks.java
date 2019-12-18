@@ -48,7 +48,7 @@ public class TaskCraftKelpBlocks extends Task {
                 ai.tick();
                 ai.openContainer(KELP_OUTPUT_CHEST);
                 //  if (InventoryUtil.count(Material.DRIED_KELP, false, true) > 640) {
-                if (InventoryUtil.countFullStacks(Material.DRIED_KELP, 53) >= 9) {
+                if (InventoryUtil.countFullStacks(Material.DRIED_KELP,0, 53) >= 9) {
                     int slot = 0;
                     while (InventoryUtil.count(Material.DRIED_KELP, true, false) < 576 && slot <= 53) {
 
