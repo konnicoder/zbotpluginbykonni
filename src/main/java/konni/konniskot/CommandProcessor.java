@@ -24,6 +24,7 @@ class CommandProcessor {
     private static TaskDailyRoutine dailyroutine;
     private static final File scrambleComplimentFile = new File(Main.instance.getDataFolder(), "compliments.txt");
     private static final ArrayList<String> compliments = new ArrayList<>();
+    private static TaskGetSand taskgetsand;
 
     static void onCommand(String user, String command, boolean pm) throws Exception {
         String[] args = command.split(" ");
@@ -65,7 +66,17 @@ class CommandProcessor {
         }
         switch (args[0]) {
 
-            
+            case "get":
+                if (args.length == 2) {
+
+                    taskgetsand = new TaskGetSand();
+                    taskgetsand.start();
+                }
+                break;
+
+            case "stop":
+                taskgetsand.cancel();
+                break;
 
             case "readsign":
                 new TaskReadSign().start();
@@ -115,8 +126,8 @@ class CommandProcessor {
                 shulkerrun.start();
                 break;
 
-            case "button":
-                new TaskButtonpress().start();
+            case "bookshelf":
+                new TaskExtractBooks().start();
                 break;
 
             case "gold":
@@ -146,6 +157,10 @@ class CommandProcessor {
                 } else {
                     System.out.println("Task läuft nicht");
                 }
+                break;
+
+            case "inventory":
+                new TaskCheckInventory().start();
                 break;
 
             case "concrete":
