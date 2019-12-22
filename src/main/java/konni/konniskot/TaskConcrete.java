@@ -34,8 +34,9 @@ public class TaskConcrete extends Task {
     private static final Location POWDER_CHEST_LOC = new Location(216, 137, -8676).centerHorizontally();
     private static final Location POWDER_CHEST_WALK = new Location(216, 137, -8674).centerHorizontally();
     private static Material colourpowder = null;
-    private static Material colourdye = Material.BLACK_DYE;
+    private static Material colourdye = null;
     private static final HashSet<Material> powder = new HashSet<>();
+    private static final HashSet<Material> dyes = new HashSet<>();
     private int neededpowder = 0;
     private int powderslot = 37;
     private int concretemined = 0;
@@ -55,18 +56,22 @@ public class TaskConcrete extends Task {
                 case "black":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.BLACK_CONCRETE_POWDER;
+                    colourdye = Material.BLACK_DYE;
                     break;
                 case "red":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.RED_CONCRETE_POWDER;
+                    colourdye = Material.RED_DYE;
                     break;
                 case "green":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.GREEN_CONCRETE_POWDER;
+                    colourdye = Material.GREEN_DYE;
                     break;
                 case "brown":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.BROWN_CONCRETE_POWDER;
+                    colourdye = Material.BROWN_DYE;
                     break;
                 case "blue":
                     System.out.println("Material set to: " + blockfarbe);
@@ -76,51 +81,61 @@ public class TaskConcrete extends Task {
                 case "purple":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.PURPLE_CONCRETE_POWDER;
+                    colourdye = Material.PURPLE_DYE;
                     break;
                 case "cyan":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.CYAN_CONCRETE_POWDER;
+                    colourdye = Material.CYAN_DYE;
                     break;
                 case "light_gray":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.LIGHT_GRAY_CONCRETE_POWDER;
+                    colourdye = Material.LIGHT_GRAY_DYE;
                     break;
                 case "gray":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.GRAY_CONCRETE_POWDER;
+                    colourdye = Material.GRAY_DYE;
                     break;
                 case "pink":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.PINK_CONCRETE_POWDER;
+                    colourdye = Material.PINK_DYE;
                     break;
                 case "lime":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.LIME_CONCRETE_POWDER;
+                    colourdye = Material.LIME_DYE;
                     break;
                 case "yellow":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.YELLOW_CONCRETE_POWDER;
+                    colourdye = Material.YELLOW_DYE;
                     break;
                 case "light_blue":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.LIGHT_BLUE_CONCRETE_POWDER;
+                    colourdye = Material.LIGHT_BLUE_DYE;
                     break;
                 case "magenta":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.MAGENTA_CONCRETE_POWDER;
+                    colourdye = Material.MAGENTA_DYE;
                     break;
                 case "orange":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.ORANGE_CONCRETE_POWDER;
+                    colourdye = Material.ORANGE_DYE;
                     break;
                 case "white":
                     System.out.println("Material set to: " + blockfarbe);
                     colourpowder = Material.WHITE_CONCRETE_POWDER;
+                    colourdye = Material.WHITE_DYE;
                     break;
             }
-
+            System.out.println("Dye set to: "+colourdye);
             neededpowder = goal;
-            //Main.self.sendChat("ok");
             while (concretemined < goal && abbruch == false) {
                 Main.self.selectSlot(1);
                 ai.tick(5);
@@ -128,14 +143,13 @@ public class TaskConcrete extends Task {
                 if (Main.self.getLocation().distanceTo(CONCRETE_FARM_WALK) > 0.1) {
                     ai.moveTo(CONCRETE_FARM_WALK);
                 }
-                System.out.println("neededpowder " + neededpowder);
-                System.out.println("concretemined " + concretemined);
-                System.out.println("goal " + goal);
-
+                //System.out.println("neededpowder " + neededpowder);
+                //System.out.println("concretemined " + concretemined);
+                //System.out.println("goal " + goal);
                 ai.tick();
 
-                if (teststackavaliable(colourpowder, powderslot)) {
-                    while (teststackavaliable(colourpowder, powderslot) && concretemined < goal) {
+                if (KaiTools.testStackAvaliable(colourpowder, powderslot)) {
+                    while (KaiTools.testStackAvaliable(colourpowder, powderslot) && concretemined < goal) {
 
                         if (powder.contains(Main.self.getEnvironment().getBlockAt(CONCRETE_FARM_LOC).getType())) {
                             Main.self.selectSlot(0);
@@ -211,6 +225,22 @@ public class TaskConcrete extends Task {
 
     public void getCraftingMaterials(Material dye) throws InterruptedException {
 
+        ai.moveTo(DYE_CHEST_WALK);
+        ai.tick();
+        ai.openContainer(DYE_CHEST_LOC);
+
+        for (int slot = 0; slot <= 53; slot++) {
+            if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == dye) {
+                ai.withdrawSlot(slot);
+                slot = 54;
+            }
+            if (slot >= 53 && InventoryUtil.countFullStacks(dye, 54, 89) == 0) {
+                Main.self.sendChat("pls refill the dye chest with the correct dye u stupid fuck");
+            }
+        }
+        ai.tick();
+        ai.closeContainer();
+
         ai.moveTo(SAND_TESSERACT_WALK);
         ai.tick();
         while (InventoryUtil.countFullStacks(Material.SAND, 0, 44) < 4) {
@@ -225,22 +255,6 @@ public class TaskConcrete extends Task {
             ai.clickBlock(GRAVEL_TESSERACT_LOC);
             ai.tick();
         }
-
-        ai.moveTo(DYE_CHEST_WALK);
-        ai.tick();
-        ai.openContainer(DYE_CHEST_LOC);
-
-        for (int slot = 0; slot <= 53; slot++) {
-            if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == dye) {
-                ai.withdrawSlot(slot);
-                slot = 54;
-            }
-            if (slot > 53 && InventoryUtil.countFullStacks(dye, 54, 89) == 0) {
-                Main.self.sendChat("is the chest empty?");
-            }
-        }
-        ai.tick();
-        ai.closeContainer();
 
     }
 
@@ -299,26 +313,29 @@ public class TaskConcrete extends Task {
     public void getConcrete() throws InterruptedException {
         ai.moveTo(POWDER_CHEST_WALK);
         ai.tick();
-        ai.openContainer(POWDER_CHEST_LOC);
-        ai.tick(3);
+        //ai.open
 
-        while (neededpowder > 0 && InventoryUtil.countFreeStorageSlots(true, false) >= 0 && abbruch == false) {
+        while (neededpowder > 0 && InventoryUtil.countFreeStorageSlots(true, false) > 0 && abbruch == false) {
             System.out.println("needpowder" + neededpowder);
-
+            ai.openContainer(POWDER_CHEST_LOC);
             for (int slot = 0; slot <= 53; slot++) {
-               
+
+                ai.tick();
                 if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == colourpowder) {
                     System.out.println(slot + " concrete found");
                     neededpowder = neededpowder - Main.self.getInventory().getSlot(slot).getAmount();
                     ai.withdrawSlot(slot);
                     System.out.println("!!!!!!");
                     ai.tick();
+                    if (slot >= 53) {
+                        ai.closeContainer();
+                    }
                 }
-                
+
                 ai.tick();
-                
-                if (neededpowder > 0 && slot > 53) {
-                    
+
+                if (neededpowder > 0 && slot >= 53) {
+                    ai.closeContainer();
                     Main.self.sendChat("No fitting concrete powder found, crafting new one...");
                     getCraftingMaterials(colourdye);
                     ai.tick();
@@ -327,15 +344,7 @@ public class TaskConcrete extends Task {
             }
         }
         ai.tick();
-        ai.closeContainer();
-    }
 
-    public boolean teststackavaliable(Material mat, int slot) {
-        if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     static {
@@ -369,5 +378,7 @@ public class TaskConcrete extends Task {
         powder.add(Material.ORANGE_CONCRETE_POWDER);
         powder.add(Material.WHITE_CONCRETE);
         powder.add(Material.WHITE_CONCRETE_POWDER);
+        dyes.add(Material.BLACK_DYE);
+        dyes.add(Material.RED_DYE);
     }
 }
