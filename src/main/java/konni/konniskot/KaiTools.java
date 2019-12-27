@@ -5,6 +5,11 @@
  */
 package konni.konniskot;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.function.Predicate;
+import zedly.zbot.BlockFace;
+import zedly.zbot.ConcurrentLinkedQueue;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
 
@@ -27,13 +32,13 @@ public class KaiTools {
         int ScanAnker2Y = y - yscanrange;
         int ScanAnker2Z = z + 1;
 
-        int durchsuchte_blöcke = 0;
+        int durchsuchte_bloecke = 0;
         for (int shelllevel = 1; shelllevel <= searchrange; shelllevel++) {
 
             for (int X = ScanAnker1X; X >= ScanAnker2X; X--) {
                 for (int Z = ScanAnker1Z; Z <= ScanAnker2Z; Z++) {
                     for (int Y = ScanAnker1Y; Y >= ScanAnker2Y; Y--) {
-                        durchsuchte_blöcke++;
+                        durchsuchte_bloecke++;
                         if (Main.self.getEnvironment().getBlockAt(X, Y, Z).getType() == Material.BIRCH_PLANKS) {
                             break;
                         }
@@ -51,9 +56,47 @@ public class KaiTools {
             ScanAnker2Z++;
         }
         System.out.println("shell zuende");
-        System.out.println("blöcke durchsucht: " + durchsuchte_blöcke);
+        System.out.println("blöcke durchsucht: " + durchsuchte_bloecke);
 
         return null;
+    }
+
+    public static Location BFSScan(Predicate<Location> pred, int x, int y, int z, int viewrange) {
+        HashSet<Location> searched_blocks = new HashSet<>();
+        final BlockFace[] searchdirections = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
+
+        LinkedList<Location> scanborder = new LinkedList<>();
+
+        Location origin = new Location(x, y, z);
+        searched_blocks.add(origin);
+        scanborder.add(origin);
+
+        while (!scanborder.isEmpty()) {
+            Location loc = scanborder.removeFirst();
+
+            if (pred.test(loc)) {
+                return loc;
+            }
+            for (BlockFace face : searchdirections) {
+                Location relatives = loc.getRelative(face.getDirection());
+                if (searched_blocks.contains(relatives)) {
+                    continue;
+                }
+                if (relatives.distanceTo(origin) > viewrange) {
+                    continue;
+                }
+                searched_blocks.add(relatives);
+                scanborder.add(relatives);
+            }
+
+        }
+        return null;
+    }
+
+    public static Location BFSScan(Material mat, int x, int y, int z, int viewrange) {
+        return BFSScan((loc) -> {
+            return Main.self.getEnvironment().getBlockAt(loc).getType() == mat;
+        }, x, y, z, viewrange);
     }
 
     public static boolean testStackAvaliable(Material mat, int slot) {

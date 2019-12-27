@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import konni.konniskot.BotEdit.TaskPyramid;
+import konni.konniskot.BotEdit.TaskPyramidBFS;
 
 /**
  *
@@ -17,7 +19,8 @@ import java.util.ArrayList;
  */
 class CommandProcessor {
 
-    private static TaskGoldcraften goldcraft;
+    private static TaskGoldcraften goldingotcraft;
+    private static TaskCraftGoldblocks goldblockcraft;
     private static TaskGrindpigmen pigmentask;
     private static TaskShulkerleeren shulkerrun;
     private static TaskGoldfarm goldfarm;
@@ -32,7 +35,7 @@ class CommandProcessor {
 
         switch (args[0]) {
 
-            case "repeat":
+            case "Testt":
 
                 new TaskTest().start();
 
@@ -65,6 +68,34 @@ class CommandProcessor {
 
         }
         switch (args[0]) {
+
+            case "trench":
+                new TaskDigTrench().start();
+                break;
+
+            case "skulls":
+                new TaskWitherSkulls().start();
+                break;
+
+            case "bfspyr":
+                if (args.length == 5) {
+                    int x = Integer.parseInt(args[1]);
+                    int y = Integer.parseInt(args[2]);
+                    int z = Integer.parseInt(args[3]);
+                    int size = Integer.parseInt(args[4]);
+                    new TaskPyramidBFS(x, y, z, size).start();
+                }
+                break;
+
+            case "hpyr":
+                if (args.length == 5) {
+                    int x = Integer.parseInt(args[1]);
+                    int y = Integer.parseInt(args[2]);
+                    int z = Integer.parseInt(args[3]);
+                    int size = Integer.parseInt(args[4]);
+                    new TaskPyramid(x, y, z, size).start();
+                }
+                break;
 
             case "get":
                 if (args.length == 2) {
@@ -145,18 +176,23 @@ class CommandProcessor {
                 break;
 
             case "craft_gold":
-                goldcraft = new TaskGoldcraften();
-                goldcraft.start();
+                goldingotcraft = new TaskGoldcraften(true);
+                goldingotcraft.start();
                 Main.self.sendChat("crafting goldingots");
                 break;
 
             case "craft_gold_stop":
-                if (goldcraft != null) {
-                    goldcraft.cancel();
+                if (goldingotcraft != null) {
+                    goldingotcraft.cancel();
                     System.out.println("stopped TaskGoldcraften");
                 } else {
                     System.out.println("Task läuft nicht");
                 }
+                break;
+
+            case "craft_goldblocks":
+                goldblockcraft = new TaskCraftGoldblocks();
+                goldblockcraft.start();
                 break;
 
             case "inventory":

@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
+
 import zedly.zbot.event.Event;
 import zedly.zbot.Location;
 import zedly.zbot.BlockFace;
@@ -59,6 +60,24 @@ public class BlockingAI implements Runnable {
             }
             nodes = path.getLocations();
         }
+        followPath(nodes);
+        return true;
+    }
+
+    public boolean navigateTo(Location target) throws InterruptedException {
+        List<Location> nodes;
+        while (Main.self.getLocation().distanceSquareTo(target) > 1) {
+            Location oldLoc = Main.self.getLocation();
+            GeometricPath path = AStar.getPath(target, true);
+            if (path == null) {
+                return false;
+            }
+            nodes = path.getLocations();
+            followPath(nodes);
+        }
+        Location oldLoc = Main.self.getLocation();
+        nodes = new LinkedList<>();
+        nodes.add(target);
         followPath(nodes);
         return true;
     }
@@ -204,6 +223,19 @@ public class BlockingAI implements Runnable {
             return 3;
         }
         return transferItem(sourceSlot, destSlot);
+    }
+    
+     public int swapItems(int sourceSlot, int destSlot) throws InterruptedException {
+        if (!clickSlot(sourceSlot, 0, 0)) {
+            return 1;
+        }
+        if (!clickSlot(destSlot, 0, 0)) {
+            return 2;
+        }
+        if (!clickSlot(sourceSlot, 0, 0)) {
+            return 3;
+        }
+        return 0;
     }
 
     public int transferItem(int sourceSlot, int destSlot) throws InterruptedException {

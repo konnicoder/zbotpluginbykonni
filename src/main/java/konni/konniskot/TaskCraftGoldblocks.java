@@ -13,7 +13,7 @@ import zedly.zbot.Material;
  *
  * @author Konstantin
  */
-public class TaskGoldblockscraften extends Task {
+public class TaskCraftGoldblocks extends Task {
 
     private static final Location startpunkt = new Location(299, 137, -8712).centerHorizontally();
     private static final Location craftingbench = new Location(301, 138, -8712).centerHorizontally();
@@ -22,21 +22,23 @@ public class TaskGoldblockscraften extends Task {
     private static final Location goldblockTesseract = new Location(300, 138, -8715).centerHorizontally();
     private static final Location goldblockablegen = new Location(299, 137, -8715).centerHorizontally();
 
-    public TaskGoldblockscraften() {
+    public TaskCraftGoldblocks() {
         super(100);
     }
 
     public void run() {
         try {
+            ai.moveTo(ingotholen);
+            ai.tick();
             while (true) {
 
-                ai.moveTo(ingotholen);
+                
                 ai.tick();
                 while (InventoryUtil.count(Material.GOLD_INGOT, true, false) < 9 * 64) {
                     Main.self.clickBlock(ingotTesseract);
-                    ai.tick(3);
+                    ai.tick();
                 }
-                ai.moveTo(startpunkt);
+                
 
                 ai.openContainer(craftingbench);
                 int staticOffset = Main.self.getInventory().getStaticOffset();
@@ -47,21 +49,19 @@ public class TaskGoldblockscraften extends Task {
                             ai.transferItem(local, crafting);
                             System.out.println("MIAUUUU " + local + " " + crafting);
 
-                            ai.tick(2);
+                            ai.tick();
                             break;
                         }
                     }
                 }
                 Main.self.getInventory().click(0, 1, 0);
                 ai.closeContainer();
-
-                ai.moveTo(goldblockablegen);
-                ai.tick(3);
                 Main.self.sneak(true);
-                ai.tick();
+                ai.tick(1);
                 Main.self.placeBlock(goldblockTesseract, BlockFace.EAST);
                 ai.tick();
                 Main.self.sneak(false);
+                
             }
         } catch (InterruptedException siglinde) {
         }

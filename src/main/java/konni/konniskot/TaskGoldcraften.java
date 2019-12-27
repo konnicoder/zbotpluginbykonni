@@ -22,23 +22,28 @@ public class TaskGoldcraften extends Task {
     private static final Location ingotablegen = new Location(299, 137, -8714).centerHorizontally();
     private static final Location ingotTesseract = new Location(300, 138, -8714).centerHorizontally();
     private boolean rungoldcraft = true;
-    public TaskGoldcraften() {
+    private boolean verbose;
+
+    public TaskGoldcraften(boolean verbose) {
         super(100);
+        this.verbose = verbose;
     }
 
     public void run() {
+
         try {
+            ai.moveTo(nuggetholen);
             while (rungoldcraft) {
+
                 
-                ai.moveTo(nuggetholen);
                 System.out.println("task startet");
                 ai.tick();
                 while (InventoryUtil.count(Material.GOLD_NUGGET, true, false) < 9 * 64) {
                     Main.self.clickBlock(nuggetTesseract);
-                    ai.tick(3);
+                    ai.tick(1);
                 }
-                ai.moveTo(startpunkt);
-        
+               
+
                 ai.openContainer(craftingbench);
                 int staticOffset = Main.self.getInventory().getStaticOffset();
                 for (int crafting = 1; crafting <= 9; crafting++) {
@@ -46,8 +51,8 @@ public class TaskGoldcraften extends Task {
                         if (Main.self.getInventory().getSlot(local) != null
                                 && Main.self.getInventory().getSlot(local).getType() == Material.GOLD_NUGGET) {
                             ai.transferItem(local, crafting);
-                            System.out.println("MIAUUUU " + local + " " + crafting);
 
+                            // System.out.println("MIAUUUU " + local + " " + crafting);
                             ai.tick(2);
                             break;
                         }
@@ -55,9 +60,9 @@ public class TaskGoldcraften extends Task {
                 }
                 Main.self.getInventory().click(0, 1, 0);
                 ai.closeContainer();
+
                 
-                ai.moveTo(ingotablegen);
-                ai.tick(3);
+                ai.tick();
                 Main.self.sneak(true);
                 ai.tick();
                 Main.self.placeBlock(ingotTesseract, BlockFace.EAST);
@@ -68,9 +73,10 @@ public class TaskGoldcraften extends Task {
         }
         unregister();
     }
-public void cancel(){
+
+    public void cancel() {
         rungoldcraft = false;
         System.out.println("miauuu");
-        
+
     }
 }
