@@ -5,145 +5,125 @@
  */
 package konni.konniskot;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import zedly.zbot.EntityType;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
+import zedly.zbot.entity.Entity;
 
 /**
  *
  * @author Konstantin
  */
 public class TaskTest extends Task {
-
-    private static final Location POWDER_CRAFTING_LOC = new Location(214, 138, -8664).centerHorizontally();
-    private static final Location POWDER_CRAFTING_WALK = new Location(214, 137, -8666).centerHorizontally();
-
-    private static final HashSet<Material> powder = new HashSet<>();
-
-    private static final Location POWDER_CHEST_LOC = new Location(216, 137, -8676).centerHorizontally();
-    private static final Location POWDER_CHEST_WALK = new Location(216, 137, -8674).centerHorizontally();
-
-    private static final Location GRAVEL_TESSERACT_LOC = new Location(215, 138, -8665).centerHorizontally();
-    private static final Location GRAVEL_TESSERACT_WALK = new Location(215, 137, -8666).centerHorizontally();
-    private static final Location SAND_TESSERACT_LOC = new Location(216, 138, -8665).centerHorizontally();
-    private static final Location SAND_TESSERACT_WALK = new Location(216, 137, -8666).centerHorizontally();
-    private static final Location DYE_CHEST_WALK = new Location(218, 137, -8674).centerHorizontally();
-    private static final Location DYE_CHEST_LOC = new Location(218, 137, -8676).centerHorizontally();
+   private static final Location SKEL_ATTACK_LOC = new Location(234, 10, -8784).centerHorizontally();
    
-    
-
+   
     public TaskTest() {
         super(100);
 
     }
 
     public void run() {
-        try {
-            //craftConcretePowder(Material.BLACK_DYE, Material.BLACK_CONCRETE_POWDER);
-            getCraftingMaterials(Material.BLACK_DYE);
-            ai.tick();
-            craftConcretePowder(Material.BLACK_DYE, Material.BLACK_CONCRETE_POWDER);
-            ai.tick();
-        } catch (InterruptedException ex) {
 
-        }
-
-    }
-
-    public void getCraftingMaterials(Material dye) throws InterruptedException {
-
-        ai.moveTo(SAND_TESSERACT_WALK);
-        ai.tick();
-        while (InventoryUtil.countFullStacks(Material.SAND, 0, 44) < 4) {
-            ai.clickBlock(SAND_TESSERACT_LOC);
-            ai.tick();
-        }
-        ai.moveTo(GRAVEL_TESSERACT_WALK);
-        ai.tick();
-
-        //INVENTORY COUNT
-        while (InventoryUtil.countFullStacks(Material.GRAVEL, 0, 44) < 4) {
-            ai.clickBlock(GRAVEL_TESSERACT_LOC);
-            ai.tick();
-        }
-
-        ai.moveTo(DYE_CHEST_WALK);
-        ai.tick();
-        ai.openContainer(DYE_CHEST_LOC);
-
-        for (int slot = 0; slot <= 53; slot++) {
-            if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == dye) {
-                ai.withdrawSlot(slot);
-                slot = 54;
-            }
-            if (slot == 53 && InventoryUtil.countFullStacks(dye, 54, 89) == 0) {
-                Main.self.sendChat("is the chest empty?");
-            }
-        }
-        ai.tick();
-        ai.closeContainer();
-
-    }
-
-    public void craftConcretePowder(Material dye, Material powder) throws InterruptedException {
-
-        if (Main.self.getLocation().distanceTo(POWDER_CRAFTING_WALK) > 0.1) {
-            ai.moveTo(POWDER_CRAFTING_WALK);
-        }
-        ai.tick();
-        ai.openContainer(POWDER_CRAFTING_LOC);
-        int craftingslot = 1;
-        while (craftingslot <= 9) {
-
-            for (int slot = 10; slot <= 45; slot++) {
-
-                if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == dye && craftingslot == 1 && Main.self.getInventory().getSlot(slot).getAmount() == 64) {
-                    System.out.println("dye" + craftingslot);
-                    ai.transferItem(slot, craftingslot);
-                    ai.tick();
-
-                    craftingslot++;
-                }
-
-                if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == Material.SAND && craftingslot >= 2 && craftingslot <= 5 && Main.self.getInventory().getSlot(slot).getAmount() == 64) {
-                    System.out.println("sand" + craftingslot);
-                    ai.transferItem(slot, craftingslot);
-                    ai.tick();
-                    craftingslot++;
-                }
-                if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == Material.GRAVEL && craftingslot >= 6 && craftingslot <= 9 && Main.self.getInventory().getSlot(slot).getAmount() == 64) {
-                    System.out.println("gravel" + craftingslot);
-                    ai.transferItem(slot, craftingslot);
-                    ai.tick();
-                    craftingslot++;
-                }
-
-            }
-            ai.tick(4);
-
-        }
-        ai.tick(5);
-        Main.self.getInventory().click(0, 1, 0);
-        ai.tick();
-        ai.closeContainer();
-        Main.self.sendChat("done");
-        ai.moveTo(POWDER_CHEST_WALK);
-        ai.tick();
-        ai.openContainer(POWDER_CHEST_LOC);
-        for (int slot = 54; slot <= 89; slot++) {
-            if (Main.self.getInventory().getSlot(slot) != null
-                    && Main.self.getInventory().getSlot(slot).getType() == powder) {
-                ai.depositSlot(slot);
+       
+            try {
                 ai.tick();
-            }
+                ai.moveTo(SKEL_ATTACK_LOC);
+                ai.tick();
+                Main.self.selectSlot(0);
+                while (true){
+                ai.tick();
+                    tryAttack(SKEL_ATTACK_LOC, SKEL_ATTACK_LOC);
+                }
+            } catch (InterruptedException ex) {
+               
+            
+            
+        
+        
         }
-        ai.closeContainer();
+        
+        
+        
+    }    
+
+    private boolean tryAttack(Location home, Location attackLoc) throws InterruptedException {
+        Entity skeleton = tryGetEnemy(attackLoc);
+        if (skeleton != null) {
+            
+            Main.self.attackEntity(skeleton);
+            ai.tick(3);
+            return true;
+        }
+        return false;
     }
 
-    static {
-        powder.add(Material.BLACK_CONCRETE);
+    private boolean tryAttackWither(Location home, Location attackLoc) throws InterruptedException {
+        Entity witherskelleton = tryGetEnemyWither(attackLoc);
+        if (witherskelleton != null) {
+            ai.moveTo(home);
+            ai.tick();
+            Main.self.attackEntity(witherskelleton);
+            ai.tick(5);
+            return true;
+        }
+        return false;
+    }
+
+    private Entity tryGetEnemy(Location attackLoc) throws InterruptedException {
+        try {
+            int annoyingEntities = 0;
+            Entity nearestAnnoying = null;
+            for (Entity ent : Main.self.getEnvironment().getEntities()) {
+                if (ent.getType() != EntityType.SKELETON) {
+                    continue;
+                }
+                if (ent.getLocation().distanceTo(attackLoc) < 4) {
+                    annoyingEntities++;
+                    if (nearestAnnoying == null
+                            || ent.getLocation().distanceTo(attackLoc)
+                            < nearestAnnoying.getLocation().distanceTo(attackLoc)) {
+                        nearestAnnoying = ent;
+                    }
+                }
+            }
+            if (nearestAnnoying != null) {
+                return nearestAnnoying;
+            }
+        } catch (ConcurrentModificationException ex) {
+            System.err.println("CME in getEntities() :( :(");
+        }
+        return null;
+    }
+
+    private Entity tryGetEnemyWither(Location attackLoc) throws InterruptedException {
+        try {
+            int annoyingEntities = 0;
+            Entity nearestAnnoying = null;
+            for (Entity ent : Main.self.getEnvironment().getEntities()) {
+                if (ent.getType() != EntityType.WITHER_SKELETON) {
+                    continue;
+                }
+                if (ent.getLocation().distanceTo(attackLoc) < 4) {
+                    annoyingEntities++;
+                    if (nearestAnnoying == null
+                            || ent.getLocation().distanceTo(attackLoc)
+                            < nearestAnnoying.getLocation().distanceTo(attackLoc)) {
+                        nearestAnnoying = ent;
+                    }
+                }
+            }
+            if (nearestAnnoying != null) {
+                return nearestAnnoying;
+            }
+        } catch (ConcurrentModificationException ex) {
+            System.err.println("CME in getEntities() :( :(");
+        }
+        return null;
     }
 
 }
