@@ -165,7 +165,7 @@ public class TaskPyramidBFS extends Task {
          */
         if (Main.self.getInventory().getSlot(37).getType() == mat) {
             Main.self.placeBlock(xpos, ypos, zpos, bface);
-            System.out.println("bauloc: "xpos + " " + ypos + " " + zpos);
+            System.out.println("bauloc:" + xpos + " " + ypos + " " + zpos);
 
         } else {
             System.out.println("i am holding the wrong block");
