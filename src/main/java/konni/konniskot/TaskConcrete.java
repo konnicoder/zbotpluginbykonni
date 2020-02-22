@@ -379,6 +379,19 @@ public class TaskConcrete extends Task {
         powder.add(Material.WHITE_CONCRETE);
         powder.add(Material.WHITE_CONCRETE_POWDER);
         dyes.add(Material.BLACK_DYE);
-        dyes.add(Material.RED_DYE);   
+        dyes.add(Material.RED_DYE);
+        dyes.add(Material.GREEN_DYE);
+        dyes.add(Material.BLUE_DYE);  
+        dyes.add(Material.PURPLE_DYE);  
+        dyes.add(Material.CYAN_DYE);  
+        dyes.add(Material.LIGHT_GRAY_DYE);  
+        dyes.add(Material.GRAY_DYE);
+        dyes.add(Material.PINK_DYE);  
+        dyes.add(Material.LIME_DYE);  
+        dyes.add(Material.YELLOW_DYE);  
+        dyes.add(Material.LIGHT_BLUE_DYE);  
+        dyes.add(Material.MAGENTA_DYE);  
+        dyes.add(Material.ORANGE_DYE);  
+        dyes.add(Material.WHITE_DYE);         
     }
 }

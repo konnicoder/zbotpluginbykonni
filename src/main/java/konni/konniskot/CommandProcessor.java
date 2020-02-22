@@ -19,8 +19,9 @@ import konni.konniskot.BotEdit.TaskPyramidBFS;
  */
 class CommandProcessor {
 
-    private static TaskGoldcraften goldingotcraft;
+    private static TaskCraftGoldingots goldingotcraft;
     private static TaskCraftGoldblocks goldblockcraft;
+    private static TaskCraftKelpBlocks craftkelpblocks;
     private static TaskGrindpigmen pigmentask;
     private static TaskShulkerleeren shulkerrun;
     private static TaskGoldfarm goldfarm;
@@ -28,6 +29,7 @@ class CommandProcessor {
     private static final File scrambleComplimentFile = new File(Main.instance.getDataFolder(), "compliments.txt");
     private static final ArrayList<String> compliments = new ArrayList<>();
     private static TaskGetSand taskgetsand;
+    private String status = "-v";
 
     static void onCommand(String user, String command, boolean pm) throws Exception {
         String[] args = command.split(" ");
@@ -58,16 +60,16 @@ class CommandProcessor {
                 Main.self.sendChat(comp);
                 break;
 
-            case "afk":
-                Main.self.sendChat("/afk");
-                break;
-
         }
         if (!Main.admins.contains(user)) {
             return;
 
         }
         switch (args[0]) {
+
+            case "afk":
+                Main.self.sendChat("/afk");
+                break;
 
             case "trench":
                 new TaskDigTrench().start();
@@ -118,7 +120,24 @@ class CommandProcessor {
                 break;
 
             case "kelp":
-                new TaskCraftKelpBlocks().start();
+                if (args.length == 1) {
+                    Main.self.sendChat("(prefix) kelp (amount in Tesseract) (verbose)");
+                }
+                if (args.length == 2) {
+                    int x = Integer.parseInt(args[1]);
+                    craftkelpblocks = new TaskCraftKelpBlocks(x, false);
+                    craftkelpblocks.start();
+                }
+                if (args.length == 3) {
+                    switch (args[2]) {
+                        case "-v":
+                            int x = Integer.parseInt(args[1]);
+                            craftkelpblocks = new TaskCraftKelpBlocks(x, true);
+                            craftkelpblocks.start();
+                            break;
+                    }
+                }
+
                 break;
 
             case "trash":
@@ -134,8 +153,18 @@ class CommandProcessor {
                 break;
 
             case "grind":
-                pigmentask = new TaskGrindpigmen();
-                pigmentask.start();
+                if (args.length == 1) {
+                    pigmentask = new TaskGrindpigmen(false, false);
+                    pigmentask.start();
+                }
+                if (args.length == 2) {
+                    switch (args[1]) {
+                        case "-v":
+                            pigmentask = new TaskGrindpigmen(true, true);
+                            pigmentask.start();
+                            break;
+                    }
+                }
                 break;
 
             case "stopgrind":
@@ -152,12 +181,16 @@ class CommandProcessor {
                 dailyroutine.start();
                 break;
 
-            case "daily":
+            case "daily_routine_stop":
+                dailyroutine.cancel();
+                break;
+
+            case "empty_shulkers":
                 shulkerrun = new TaskShulkerleeren();
                 shulkerrun.start();
                 break;
 
-            case "bookshelf":
+            case "extract_books":
                 new TaskExtractBooks().start();
                 break;
 
@@ -176,7 +209,7 @@ class CommandProcessor {
                 break;
 
             case "craft_gold":
-                goldingotcraft = new TaskGoldcraften(true);
+                goldingotcraft = new TaskCraftGoldingots(true);
                 goldingotcraft.start();
                 Main.self.sendChat("crafting goldingots");
                 break;
