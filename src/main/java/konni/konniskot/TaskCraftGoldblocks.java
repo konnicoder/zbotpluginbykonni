@@ -31,37 +31,7 @@ public class TaskCraftGoldblocks extends Task {
             ai.moveTo(ingotholen);
             ai.tick();
             while (true) {
-
-                
-                ai.tick();
-                while (InventoryUtil.count(Material.GOLD_INGOT, true, false) < 9 * 64) {
-                    Main.self.clickBlock(ingotTesseract);
-                    ai.tick();
-                }
-                
-
-                ai.openContainer(craftingbench);
-                int staticOffset = Main.self.getInventory().getStaticOffset();
-                for (int crafting = 1; crafting <= 9; crafting++) {
-                    for (int local = staticOffset; local < staticOffset + 36; local++) {
-                        if (Main.self.getInventory().getSlot(local) != null
-                                && Main.self.getInventory().getSlot(local).getType() == Material.GOLD_INGOT) {
-                            ai.transferItem(local, crafting);
-                            System.out.println("MIAUUUU " + local + " " + crafting);
-
-                            ai.tick();
-                            break;
-                        }
-                    }
-                }
-                Main.self.getInventory().click(0, 1, 0);
-                ai.closeContainer();
-                Main.self.sneak(true);
-                ai.tick(1);
-                Main.self.placeBlock(goldblockTesseract, BlockFace.EAST);
-                ai.tick();
-                Main.self.sneak(false);
-                
+                KaiTools.CraftFullBlockSpeed(Material.GOLD_INGOT, ingotTesseract, goldblockTesseract, craftingbench, ai);
             }
         } catch (InterruptedException siglinde) {
         }

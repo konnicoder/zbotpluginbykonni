@@ -28,7 +28,7 @@ public class Main extends ZBotPlugin {
 
     @Override
     public void onEnable(Self self) {
-        System.out.println("OIIIIII");
+        System.out.println("loading plugin KonnisKot...");
         config = getConfig();
         Main.self = self;
         instance = this;
