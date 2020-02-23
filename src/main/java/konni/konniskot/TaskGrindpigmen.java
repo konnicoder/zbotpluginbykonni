@@ -23,9 +23,12 @@ public class TaskGrindpigmen extends Task {
     private static final Location BACKUP_LOC = new Location(295, 137, -8699);
     private static boolean playerPresent = false;
     private static boolean shouldrun = true;
-
-    public TaskGrindpigmen() {
+    private boolean verbose;
+    private boolean chatty;
+    public TaskGrindpigmen(boolean verbose, boolean chatty) {
         super(100);
+        this.verbose = verbose;
+        this.chatty = chatty;
     }
 
     public void run() {
@@ -42,20 +45,28 @@ public class TaskGrindpigmen extends Task {
                     System.out.println("player present");
 
                     if (Main.self.getLocation().distanceTo(BACKUP_LOC) > 0.1) {
+                        if (chatty){
                         Main.self.sendChat("I can see you!");
+                        }
                         tryAttack(home, home);
                         ai.tick(40);
                         tryAttack(home, home);
                         ai.tick();
                         ai.moveTo(BACKUP_LOC);
+                        if (chatty){
                         Main.self.sendChat("Let me make some space for you!");
+                        }
+                        if (verbose){
                         System.out.println("backing up");
+                        }
                     }
 
                 } else {
                     if (Main.self.getLocation().distanceTo(home) > 0.1) {
                         ai.moveTo(home);
+                        if (verbose){
                         System.out.println("komme zurück");
+                        }
                     }
                     grind();
                 }
@@ -107,25 +118,14 @@ public class TaskGrindpigmen extends Task {
     private boolean grind() throws InterruptedException {
         ai.tick();
         tryAttack(home, home);
+        if (verbose){
         System.out.println("hit");
         System.out.println("press button");
+        }
         ai.tick(3);
         Main.self.placeBlock(BUTTON_LOC, BlockFace.EAST);
         ai.tick(5);
         return false;
-    }
-    
-    private boolean emptyChest() throws InterruptedException {
-        for (int i = 0; i < Main.self.getInventory().getStaticOffset(); i++) {
-            if (InventoryUtil.findFreeStorageSlot(true) == -1) {
-                return true;
-            }
-            if (Main.self.getInventory().getSlot(i) != null) {
-                ai.withdrawSlot(i);
-            }
-        }
-        return false;
-
     }
 
     private Entity tryGetEnemy(Location attackLoc) throws InterruptedException {

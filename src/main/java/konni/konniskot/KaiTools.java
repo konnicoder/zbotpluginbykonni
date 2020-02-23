@@ -87,12 +87,12 @@ public class KaiTools {
     }
     
     public static void CraftFullBlockSpeed(Material mat, Location tessvor, Location tessdone, Location craft, BlockingAI ai) throws InterruptedException {
-
-        while (InventoryUtil.countFullStacks(mat, 9, 44) < 9) {
+        while(true){
+        while (InventoryUtil.countFreeStorageSlots(true, false)>1) {
             Main.self.clickBlock(tessvor);
             ai.tick();
         }
-
+      
         ai.openContainer(craft);
         int staticOffset = Main.self.getInventory().getStaticOffset();
         for (int crafting = 1; crafting <= 9; crafting++) {
@@ -110,6 +110,8 @@ public class KaiTools {
         Main.self.getInventory().click(0, 1, 0);
         ai.closeContainer();
         fillTesseract(tessdone);
+        ai.tick();
+    }
     }
 
     public static Location BFSScan(Predicate<Location> pred, int x, int y, int z, int viewrange) {

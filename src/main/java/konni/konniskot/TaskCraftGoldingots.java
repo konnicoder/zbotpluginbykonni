@@ -37,9 +37,9 @@ public class TaskCraftGoldingots extends Task {
             ai.moveTo(nuggetholen);
             ai.tick();
 
-            while (true) {
+            
                 KaiTools.CraftFullBlockSpeed(Material.GOLD_NUGGET, nuggetTesseract, ingotTesseract, craftingbench, ai);
-            }
+            
 
         } catch (InterruptedException guenther) {
         }
