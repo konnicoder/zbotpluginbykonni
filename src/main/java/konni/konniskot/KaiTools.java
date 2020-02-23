@@ -85,33 +85,31 @@ public class KaiTools {
         ai.closeContainer();
         fillTesseract(tessdone);
     }
-    
+
     public static void CraftFullBlockSpeed(Material mat, Location tessvor, Location tessdone, Location craft, BlockingAI ai) throws InterruptedException {
-        while(true){
-        while (InventoryUtil.countFreeStorageSlots(true, false)>1) {
-            Main.self.clickBlock(tessvor);
-            ai.tick();
-        }
-      
         ai.openContainer(craft);
-        int staticOffset = Main.self.getInventory().getStaticOffset();
-        for (int crafting = 1; crafting <= 9; crafting++) {
-            for (int local = staticOffset; local < staticOffset + 36; local++) {
-                if (Main.self.getInventory().getSlot(local) != null
-                        && Main.self.getInventory().getSlot(local).getType() == mat) {
-                    ai.transferItem(local, crafting);
-                    Main.self.clickBlock(tessvor);
-                    //System.out.println("MIAUUUU " + local + " " + crafting);
-                    //ai.tick(1);
-                    break;
+        while (true) {
+
+            int slotsToGet = InventoryUtil.countFreeStorageSlots(true, false);
+            for (int i = 0; i < slotsToGet; i++) {
+                Main.self.clickBlock(tessvor);
+            }
+            ai.tick();
+
+            int staticOffset = Main.self.getInventory().getStaticOffset();
+            for (int crafting = 1; crafting <= 9; crafting++) {
+                for (int local = staticOffset; local < staticOffset + 36; local++) {
+                    if (Main.self.getInventory().getSlot(local) != null
+                            && Main.self.getInventory().getSlot(local).getType() == mat) {
+                        ai.transferItem(local, crafting);
+                        // Main.self.clickBlock(tessvor);
+                        break;
+                    }
                 }
             }
+            Main.self.getInventory().click(0, 1, 0);
+            fillTesseract(tessdone);
         }
-        Main.self.getInventory().click(0, 1, 0);
-        ai.closeContainer();
-        fillTesseract(tessdone);
-        ai.tick();
-    }
     }
 
     public static Location BFSScan(Predicate<Location> pred, int x, int y, int z, int viewrange) {

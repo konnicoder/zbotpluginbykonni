@@ -8,6 +8,7 @@ package konni.konniskot.BotEdit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jdk.nashorn.internal.ir.ContinueNode;
+import konni.konniskot.InventoryUtil;
 import konni.konniskot.KaiTools;
 import konni.konniskot.Main;
 import konni.konniskot.Task;
@@ -38,9 +39,10 @@ public class TaskPyramid extends Task {
     public Material helpblock = Material.OAK_LEAVES;
     public Location walklocation;
     public Location Materialchest;
+    public Location Materialchestwalk;
 
     public TaskPyramid(int x, int y, int z, int size) {
-        super(100);
+        super(25);
         CenterPointX = x;
         CenterPointY = y;
         CenterPointZ = z;
@@ -63,27 +65,35 @@ public class TaskPyramid extends Task {
         int Z = ScanAnker1Z;
 
         try {
-
             //START LAYER
-            Location startlocation = new Location(ScanAnker1X + 2, ScanAnker1Y, ScanAnker1Z - 1).centerHorizontally();
+            Main.self.selectSlot(1);
+            Location startlocation = new Location(ScanAnker1X + 1, ScanAnker1Y, ScanAnker1Z - 1).centerHorizontally();
             ai.tick();
-            ai.moveTo(startlocation);
+            System.out.println(ScanAnker1X + " " + ScanAnker1Y + " " + ScanAnker1Z);
+            ai.navigateTo(startlocation);
             ai.tick();
-
+            getMaterialChest();
+            ai.tick();
+            getMaterialsFromChest();
+            ai.tick();
+            ai.navigateTo(startlocation);
             ai.tick(2);
 
             for (Y = CenterPointY; Y <= CenterPointY + (height - 1); Y++) {
                 X = ScanAnker1X;
                 Y = ScanAnker1Y;
                 Z = ScanAnker1Z;
-
-                findAndPlace(buildblock, ScanAnker1X, ScanAnker1Y, ScanAnker1Z, BlockFace.UP);
+                if (Main.self.getEnvironment().getBlockAt(ScanAnker1X, ScanAnker1Y, ScanAnker1Z).getType() == Material.AIR) {
+                    findAndPlace(buildblock, ScanAnker1X, ScanAnker1Y, ScanAnker1Z, BlockFace.UP);
+                }
                 ai.tick(2);
 
                 for (Z = ScanAnker1Z + 1; Z <= ScanAnker2Z; Z++) {
+                    if (Main.self.getEnvironment().getBlockAt(X, Y, Z).getType() == Material.AIR) {
+                        findAndPlace(buildblock, X, Y, Z, BlockFace.SOUTH);
+                    }
 
-                    findAndPlace(buildblock, X, Y, Z, BlockFace.SOUTH);
-                    walklocation = new Location(X, Y + 1, Z).centerHorizontally();
+                    walklocation = new Location(X + 1, Y, Z).centerHorizontally();
                     ai.tick();
                     ai.moveTo(walklocation);
                     ai.tick();
@@ -91,9 +101,12 @@ public class TaskPyramid extends Task {
                 Z = ScanAnker2Z;
 
                 for (X = ScanAnker1X - 1; X >= ScanAnker2X; X--) {
+                    if (Main.self.getEnvironment().getBlockAt(X, Y, Z).getType() == Material.AIR) {
+                        findAndPlace(buildblock, X, Y, Z, BlockFace.WEST);
+                    }
 
-                    findAndPlace(buildblock, X, Y, Z, BlockFace.WEST);
-                    walklocation = new Location(X, Y + 1, Z).centerHorizontally();
+                    ai.tick();
+                    walklocation = new Location(X, Y, Z + 1).centerHorizontally();
                     ai.moveTo(walklocation);
                     ai.tick();
                 }
@@ -101,24 +114,36 @@ public class TaskPyramid extends Task {
 
                 for (Z = ScanAnker2Z - 1; Z >= ScanAnker1Z; Z--) {
 
-                    walklocation = new Location(X, Y + 1, Z).centerHorizontally();
                     ai.tick();
                     ai.moveTo(walklocation);
                     ai.tick();
-                    findAndPlace(buildblock, X, Y, Z, BlockFace.NORTH);
+                    if (Main.self.getEnvironment().getBlockAt(X, Y, Z).getType() == Material.AIR) {
+                        findAndPlace(buildblock, X, Y, Z, BlockFace.NORTH);
+                    }
+                    ai.tick();
+
+                    ai.tick();
+                    walklocation = new Location(X - 1, Y, Z).centerHorizontally();
+                    ai.tick();
+                    ai.moveTo(walklocation);
                 }
                 Z = ScanAnker1Z;
 
                 for (X = ScanAnker2X + 1; X < ScanAnker1X; X++) {
+                    if (Main.self.getEnvironment().getBlockAt(X, Y, Z).getType() == Material.AIR) {
+                        findAndPlace(buildblock, X, Y, Z, BlockFace.EAST);
+                    }
 
-                    findAndPlace(buildblock, X, Y, Z, BlockFace.EAST);
-                    walklocation = new Location(X, Y + 1, Z).centerHorizontally();
+                    ai.tick();
+                    walklocation = new Location(X, Y, Z - 1).centerHorizontally();
                     ai.moveTo(walklocation);
                     ai.tick();
                 }
                 X = ScanAnker2X;
                 ai.tick();
-                findAndPlace(helpblock, ScanAnker1X - 1, ScanAnker1Y, ScanAnker1Z + 1, BlockFace.WEST);
+                if (Main.self.getEnvironment().getBlockAt(X, Y, Z).getType() == Material.AIR) {
+                    findAndPlace(helpblock, ScanAnker1X - 1, ScanAnker1Y, ScanAnker1Z + 1, BlockFace.WEST);
+                }
                 ai.tick(3);
 
                 ScanAnker1X--;
@@ -128,6 +153,9 @@ public class TaskPyramid extends Task {
                 ScanAnker2X++;
                 ScanAnker2Y++;
                 ScanAnker2Z--;
+                ai.tick(3);
+                getMaterialsFromChest();
+                ai.tick(3);
             }
 
         } catch (InterruptedException ex) {
@@ -136,28 +164,40 @@ public class TaskPyramid extends Task {
     }
 
     public void findAndPlace(Material mat, int xpos, int ypos, int zpos, BlockFace bface) throws InterruptedException {
-        while (testStackAvaliable(mat, 37) == false) {
-            if (testStackAvaliable(mat, 37) == false) {
-                if (searchininventory(mat) == false) {
-                    getMaterialsFromChest();
-                    System.out.println("get Mat from chest");
-                } else {
+        // while (testStackAvaliable(mat, 37) == false) {
+        if (testStackAvaliable(mat, 37) == false) {
+            if (searchininventory(mat) == false) {
+                System.out.println("inventory empty");
+                getMaterialsFromChest();
+                ai.tick(2);
 
-                    for (int slot = 9; slot <= 44; slot++) {
-                        if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat) {
-                            ai.swapItems(slot, 37);
-                            System.out.println("item found and moved");
-                        }
+            } else {
+
+                for (int slot = 9; slot <= 44; slot++) {
+                    if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat) {
+                        ai.swapItems(slot, 37);
+                        System.out.println("item found and moved");
+                        break;
                     }
-                    System.out.println("should be moved");
                 }
+                System.out.println("should be moved");
             }
         }
-        if (Main.self.getInventory().getSlot(37).getType() == mat) {
-            Main.self.placeBlock(xpos, ypos, zpos, bface);
+        int goldblocks = InventoryUtil.count(Material.GOLD_BLOCK, true, false);
+        System.out.println(goldblocks);
+        if (goldblocks <= 280) {
+            Main.self.sendChat("/msg Konni999 goldblocks at" + goldblocks + ", ding Konni");
+        }
 
-        } else {
-            System.out.println("i am holding the wrong block");
+        // if (InventoryUtil.countFreeStorageSlots(true, false)>10) {
+        //    Main.self.sendChat("/msg Konni999 Goldblocks in inventory low");
+        //}
+        //}
+        while (Main.self.getEnvironment().getBlockAt(xpos, ypos, zpos).getType() != Material.GOLD_BLOCK) {
+
+            Main.self.placeBlock(xpos, ypos, zpos, bface);
+            ai.tick();
+
         }
     }
 
@@ -188,18 +228,40 @@ public class TaskPyramid extends Task {
         int x = (int) aktuell.getX();
         int y = (int) aktuell.getY();
         int z = (int) aktuell.getZ();
-        Materialchest = KaiTools.Scan(Material.CHEST, x, y, z, 2, 5);
+        Materialchest = KaiTools.Scan(Material.CHEST, x, y, z, 20, 20);
+       // Materialchest = new Location(-1293, 185, -3691);
+        Materialchestwalk = Materialchest.getRelative(-2, 0, 0).centerHorizontally();
+        System.out.println("Materialchest set at: " + Materialchest);
 
     }
-    
-    
 
-    public void getMaterialsFromChest() {
-        int MatchestX = (int) Materialchest.getX();
-        int MatchestY = (int) Materialchest.getY();
-        int MatchestZ = (int) Materialchest.getZ();
-        
+    public void getMaterialsFromChest() throws InterruptedException {
+
+        ai.tick();
+
+        ai.navigateTo(Materialchestwalk);
+        ai.tick();
+        if (ai.openContainer(Materialchest)) {
+            ai.tick(3);
+            emptyChest();
+        }
+        ai.tick(3);
+
+        ai.tick(3);
+        ai.closeContainer();
+        ai.tick();
+
 //Location chestloc, Location chestwalk, Material mat
+    }
+
+    public void emptyChest() throws InterruptedException {
+        while (InventoryUtil.countFreeStorageSlots(true, false) > 1 && InventoryUtil.count(Material.GOLD_BLOCK, false, true) > 0) {
+            for (int slot = 0; slot <= 53; slot++) {
+                ai.withdrawSlot(slot);
+            }
+            break;
+
+        }
     }
 
 }

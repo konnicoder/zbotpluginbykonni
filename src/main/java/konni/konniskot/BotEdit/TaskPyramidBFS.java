@@ -142,6 +142,7 @@ public class TaskPyramidBFS extends Task {
         }
 
     }
+            
 
     public void findAndPlace(Material mat, int xpos, int ypos, int zpos, BlockFace bface) throws InterruptedException {
         /*

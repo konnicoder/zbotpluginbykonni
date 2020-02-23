@@ -10,10 +10,12 @@ import zedly.zbot.Location;
 public class TaskCraftGeneral extends Task {
 
     private static Location Tesseract1;
-    private static final Location Tesseract1 = new Location(299, 137, -8712).centerHorizontally();
+    private static Location Tesseract2;
 
-    public TaskCraftGeneral(Location loc1, Location Loc2, int amount) {
+    public TaskCraftGeneral(Location loc1, Location loc2, int amount) {
         super(100);
+        Tesseract1 = loc1;
+        Tesseract2 = loc2;
     }
 
     public void run() {

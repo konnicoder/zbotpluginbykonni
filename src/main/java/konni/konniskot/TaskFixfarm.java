@@ -77,6 +77,11 @@ public class TaskFixfarm extends Task {
             furnaceY = 130;
             furnaceZ = -8718;
             checkFurnace();
+            
+            
+            
+            
+            
         } catch (InterruptedException ex) {
 
         }

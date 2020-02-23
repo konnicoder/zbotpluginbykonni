@@ -42,6 +42,9 @@ public class TaskDailyRoutine extends Task {
     private static final Location FEATHER_TESS_WALK = new Location(299, 137, -8717).centerHorizontally();
     private static final Location FEATHER_TESS_LOC = new Location(300, 138, -8717).centerHorizontally();
 
+    private static final Location COOCKED_CHICKEN_CHEST_WALK = new Location(288, 137, -8715).centerHorizontally();
+    private static final Location COOCKED_CHICKEN_CHEST_LOC = new Location(288, 137, -8715).centerHorizontally();
+
     private static final Location COAL_CHEST_WALK = new Location(299, 132, -8717).centerHorizontally();
     private static final Location COAL_CHEST_LOC = new Location(300, 132, -8717).centerHorizontally();
 
@@ -55,6 +58,9 @@ public class TaskDailyRoutine extends Task {
     private static final Location waypoint1 = new Location(229, 137, -8711).centerHorizontally();
     private static final Location waypoint2 = new Location(229, 137, -8631).centerHorizontally();
     private static final Location signloc = new Location(256, 138, -8604).centerHorizontally();
+
+    private static final Location CHICK_TESS_WALK = new Location(299, 137, -8716).centerHorizontally();
+    private static final Location CHICK_TESS = new Location(300, 138, -8716).centerHorizontally();
 
     private static final HashSet<Material> TRASH_MATERIALS = new HashSet<>();
     private static final HashSet<Material> Fuel = new HashSet<>();
@@ -80,6 +86,12 @@ public class TaskDailyRoutine extends Task {
             Main.self.sendChat("/home xp");
             ai.tick(5);
             while (daily) {
+
+                if (getFoodLevel() <= 0) {
+                    ai.moveTo(CHICK_TESS_WALK);
+                    ai.tick();
+                    ai.clickBlock(CHICK_TESS);
+                }
                 goldfarmruns = 0;
                 while (goldfarmruns <= 5) {
                     goldfarm();
@@ -91,6 +103,11 @@ public class TaskDailyRoutine extends Task {
         }
         unregister();
 
+    }
+
+    public int getFoodLevel() {
+        int food = InventoryUtil.count(Material.COOKED_CHICKEN, true, false);
+        return food;
     }
 
     public void craftKelpBlocks(int repeats) throws InterruptedException {
@@ -219,6 +236,7 @@ public class TaskDailyRoutine extends Task {
         ai.tick();
         serviceChest(FEATHER_CHEST_WALK, FEATHER_CHEST_LOC, FEATHER_TESS_WALK, FEATHER_TESS_LOC);
         ai.tick();
+        EmptyChickens();
         ai.moveTo(COAL_CHEST_WALK);
         ai.tick();
         ai.openContainer(COAL_CHEST_LOC);
@@ -400,6 +418,7 @@ public class TaskDailyRoutine extends Task {
         }
         return null;
     }
+    
 
     private void grind() throws InterruptedException {
 
@@ -452,6 +471,11 @@ public class TaskDailyRoutine extends Task {
             }
         }
         return false;
+    }
+
+    public void EmptyChickens() throws InterruptedException {
+        ai.tick();
+
     }
 
     private void grindpigmen() throws InterruptedException {
