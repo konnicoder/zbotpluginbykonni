@@ -52,7 +52,7 @@ class CommandProcessor {
                 break;
 
             case "lil":
-                Main.self.sendChat("give me dah weed!");
+                Main.self.sendChat("give me dah weed!!");
                 break;
 
             case "compliment":
