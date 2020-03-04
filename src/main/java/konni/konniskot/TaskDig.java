@@ -54,11 +54,7 @@ public class TaskDig extends Task {
 
         for (int xachsenpunkt = X; xachsenpunkt > X2; xachsenpunkt = xachsenpunkt - sliceskip) {
             for (int zachsenpunkt = Z; zachsenpunkt < Z2; zachsenpunkt++) {
-                Location walk = new Location(xachsenpunkt, Y, zachsenpunkt).centerHorizontally();
                 try {
-
-                    ai.moveTo(walk);
-                    ai.tick();
                     experiment(xachsenpunkt, zachsenpunkt);
                 } catch (InterruptedException ex) {
 
@@ -73,14 +69,18 @@ public class TaskDig extends Task {
 //25
 
     public void experiment(int x, int z) throws InterruptedException {
+        Location walk = new Location(x, Y, z).centerHorizontally();
         Location laseraim = new Location(x, Y + 3, z);
         for (int r = 0; r < sliceheight; r++) {
+            Material mat = Main.self.getEnvironment().getBlockAt(x, Y + 3 + r, z).getType();
+            if (mat == Material.AIR || mat == Material.CAVE_AIR || mat == Material.VOID_AIR) {
+                continue;
+            }
+            ai.moveTo(walk);
             Main.self.lookAt(0, -89);
             ai.tick();
             Main.self.placeBlock(laseraim, BlockFace.EAST);
-
         }
-
     }
 
     public void doSlice(int x, int z) throws InterruptedException {
@@ -91,9 +91,7 @@ public class TaskDig extends Task {
             while (checkGravityBlocks(x, z) == false) {
                 Main.self.selectSlot(laserpickslot);
                 Location laseraim = new Location(x, Y + 3, z);
-
                 Main.self.placeBlock(laseraim, BlockFace.EAST);
-
             }
             while (checkGravityBlocks(x, z) == true) {
                 Main.self.selectSlot(shovelslot);
