@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import konni.konniskot.BotEdit.TaskPyramid;
 import konni.konniskot.BotEdit.TaskPyramidBFS;
+import zedly.zbot.BlockFace;
 
 /**
  *
@@ -23,9 +24,6 @@ class CommandProcessor {
     private static TaskCraftGoldblocks goldblockcraft;
     private static TaskCraftKelpBlocks craftkelpblocks;
     private static TaskGrindpigmen pigmentask;
-    private static TaskShulkerleeren shulkerrun;
-    private static TaskGoldfarm goldfarm;
-    private static TaskDailyRoutine dailyroutine;
     private static final File scrambleComplimentFile = new File(Main.instance.getDataFolder(), "compliments.txt");
     private static final ArrayList<String> compliments = new ArrayList<>();
     private static TaskGetSand taskgetsand;
@@ -67,12 +65,31 @@ class CommandProcessor {
         }
         switch (args[0]) {
 
-            case "afk":
-                Main.self.sendChat("/afk");
+            case "dig":
+                if (args.length == 1) {
+                    Main.self.sendChat("prefix dig x1 y1 z1 x2 y2 z2 clicks_per_slice sliceskip");
+                }
+                if (args.length == 9) {
+                    int x1 = Integer.parseInt(args[1]);
+                    int y1 = Integer.parseInt(args[2]);
+                    int z1 = Integer.parseInt(args[3]);
+                    int x2 = Integer.parseInt(args[4]);
+                    int y2 = Integer.parseInt(args[5]);
+                    int z2 = Integer.parseInt(args[6]);
+                    int sh = Integer.parseInt(args[7]);
+                    int sk = Integer.parseInt(args[8]);
+                    new TaskDig(x1, y1, z1, x2, y2, z2, sh, sk).start();
+                }
+
+                break;
+            case "mode":
+                Main.self.sneak(true);
+                Main.self.placeBlock(Main.self.getLocation(), BlockFace.EAST);
+                Main.self.sneak(false);
                 break;
 
-            case "trench":
-                new TaskDigTrench().start();
+            case "afk":
+                Main.self.sendChat("/afk");
                 break;
 
             case "skulls":
@@ -109,14 +126,6 @@ class CommandProcessor {
 
             case "stop":
                 taskgetsand.cancel();
-                break;
-
-            case "readsign":
-                new TaskReadSign().start();
-                break;
-
-            case "1":
-                Main.self.sendChat("1");
                 break;
 
             case "kelp":
@@ -176,36 +185,27 @@ class CommandProcessor {
                 }
                 break;
 
-            case "daily_routine":
-                dailyroutine = new TaskDailyRoutine();
-                dailyroutine.start();
-                break;
-
-            case "daily_routine_stop":
-                dailyroutine.cancel();
-                break;
-
-            case "empty_shulkers":
-                shulkerrun = new TaskShulkerleeren();
-                shulkerrun.start();
+            case "midas":
+                if (args.length == 1) {
+                    Main.self.sendChat("grind, craft_gold, craft_goldblocks");
+                }
+                if (args.length == 2) {
+                    switch (args[1]) {
+                        case "grind":
+                            new TaskMidas(1).start();
+                            break;
+                        case "craft_gold":
+                            new TaskMidas(2).start();
+                            break;
+                        case "craft_goldblocks":
+                            new TaskMidas(3).start();
+                            break;
+                    }
+                }
                 break;
 
             case "extract_books":
                 new TaskExtractBooks().start();
-                break;
-
-            case "gold":
-                goldfarm = new TaskGoldfarm();
-                goldfarm.start();
-                break;
-
-            case "gold_stop":
-                if (goldfarm != null) {
-                    goldfarm.cancel();
-                    System.out.println("stopped TaskGoldfarm");
-                } else {
-                    System.out.println("Task läuft nicht");
-                }
                 break;
 
             case "craft_gold":

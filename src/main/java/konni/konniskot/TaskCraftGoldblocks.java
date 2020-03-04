@@ -15,12 +15,11 @@ import zedly.zbot.Material;
  */
 public class TaskCraftGoldblocks extends Task {
 
-    private static final Location startpunkt = new Location(299, 137, -8712).centerHorizontally();
-    private static final Location craftingbench = new Location(301, 138, -8712).centerHorizontally();
-    private static final Location ingotholen = new Location(299, 137, -8714).centerHorizontally();
-    private static final Location ingotTesseract = new Location(300, 138, -8714).centerHorizontally();
-    private static final Location goldblockTesseract = new Location(300, 138, -8715).centerHorizontally();
-    private static final Location goldblockablegen = new Location(299, 137, -8715).centerHorizontally();
+     private static final Location craftingbench = new Location(295, 130, -8720).centerHorizontally();
+    private static final Location walk = new Location(295, 131, -8721).centerHorizontally();
+    private static final Location goldblockTesseract = new Location(299, 132, -8721).centerHorizontally();
+    private static final Location ingotTesseract = new Location(295, 132, -8721).centerHorizontally();
+    private boolean verbose;
 
     public TaskCraftGoldblocks() {
         super(100);
@@ -28,11 +27,11 @@ public class TaskCraftGoldblocks extends Task {
 
     public void run() {
         try {
-            ai.moveTo(ingotholen);
+            ai.moveTo(walk);
             ai.tick();
-            while (true) {
-                KaiTools.CraftFullBlockSpeed(Material.GOLD_INGOT, ingotTesseract, goldblockTesseract, craftingbench, ai);
-            }
+            
+                KaiTools.CraftFullBlockSuper("gold_block",Material.GOLD_INGOT, ingotTesseract, goldblockTesseract, craftingbench, ai);
+            
         } catch (InterruptedException siglinde) {
         }
     }

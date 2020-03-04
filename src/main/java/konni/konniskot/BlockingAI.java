@@ -153,7 +153,7 @@ public class BlockingAI implements Runnable {
         tick();
     }
 
-    public <T extends Event> boolean waitForEvent(final Class<T> eventClass, Predicate<Event> eventFilter, int timeoutMillis) throws InterruptedException {
+    public <T extends Event> boolean waitForEvent(final Class<T> eventClass, Predicate<T> eventFilter, int timeoutMillis) throws InterruptedException {
         long startTime = System.currentTimeMillis();
         final BlockingAI ai = this;
         final AtomicBoolean detected = new AtomicBoolean();
@@ -161,7 +161,7 @@ public class BlockingAI implements Runnable {
 
         Main.self.registerEvents(new Listener() {
             @EventHandler
-            public void listen(Event hue) {
+            public void listen(T hue) {
                 if (eventClass.isInstance(hue) && eventFilter.test(hue)) {
                     detected.set(true);
                     Main.self.unregisterEvents(this);

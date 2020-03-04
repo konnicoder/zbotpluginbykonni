@@ -52,17 +52,19 @@ public class TaskCraftKelpBlocks extends Task {
                 ai.moveTo(waypoint2);
                 ai.tick(5);
             }
-
-            for (int i = cycles; i > 0; i--) {
-                if (Main.self.getLocation().distanceTo(CRAFING_LOC) > 0.1) {
-                    ai.tick();
-                    ai.moveTo(CRAFING_LOC);
-                    ai.tick();
-                }
-                KaiTools.CraftFullBlock(Material.DRIED_KELP, TESS_PRECRAFT_LOC, TESS_AFTERCRAFT_LOC, CRAFTINGBENCH, ai);
+            if (Main.self.getLocation().distanceTo(CRAFING_LOC) > 0.1) {
                 ai.tick();
-                System.out.println(i);
+                ai.moveTo(CRAFING_LOC);
+                ai.tick();
             }
+          KaiTools.CraftFullBlockSuper("dried_kelp_block",Material.DRIED_KELP, TESS_PRECRAFT_LOC, TESS_AFTERCRAFT_LOC, CRAFTINGBENCH, ai);
+//            for (int i = cycles; i > 0; i--) {
+//
+//                //KaiTools.CraftFullBlockSuper("dried_kelp_block", TESS_PRECRAFT_LOC, TESS_AFTERCRAFT_LOC, CRAFTINGBENCH, ai);
+//                KaiTools.CraftFullBlock(Material.DRIED_KELP, TESS_PRECRAFT_LOC, TESS_AFTERCRAFT_LOC, CRAFTINGBENCH, ai);
+//                ai.tick();
+//                System.out.println(i);
+//            }
             System.out.println("done");
         } catch (InterruptedException ex) {
         }

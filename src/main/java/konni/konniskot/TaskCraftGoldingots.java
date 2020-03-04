@@ -18,12 +18,10 @@ import zedly.zbot.entity.Entity;
  */
 public class TaskCraftGoldingots extends Task {
 
-    private static final Location startpunkt = new Location(299, 137, -8712).centerHorizontally();
-    private static final Location craftingbench = new Location(301, 138, -8712).centerHorizontally();
-    private static final Location nuggetholen = new Location(299, 137, -8713).centerHorizontally();
-    private static final Location nuggetTesseract = new Location(300, 138, -8713).centerHorizontally();
-    private static final Location ingotablegen = new Location(299, 137, -8714).centerHorizontally();
-    private static final Location ingotTesseract = new Location(300, 138, -8714).centerHorizontally();
+    private static final Location craftingbench = new Location(295, 130, -8720).centerHorizontally();
+    private static final Location walk = new Location(297, 130, -8718).centerHorizontally();
+    private static final Location nuggetTesseract = new Location(297, 132, -8717).centerHorizontally();
+    private static final Location ingotTesseract = new Location(295, 132, -8721).centerHorizontally();
     private boolean verbose;
 
     public TaskCraftGoldingots(boolean verbose) {
@@ -34,12 +32,12 @@ public class TaskCraftGoldingots extends Task {
     public void run() {
 
         try {
-            ai.moveTo(nuggetholen);
+            ai.moveTo(walk);
             ai.tick();
-
-            
-                KaiTools.CraftFullBlockSpeed(Material.GOLD_NUGGET, nuggetTesseract, ingotTesseract, craftingbench, ai);
-            
+            KaiTools.CraftFullBlockSuper("gold_ingot_from_nuggets",Material.GOLD_NUGGET, nuggetTesseract, ingotTesseract, craftingbench, ai);
+          //  while (true) {
+            //    KaiTools.CraftFullBlock(Material.GOLD_NUGGET, nuggetTesseract, ingotTesseract, craftingbench, ai);
+            //}
 
         } catch (InterruptedException guenther) {
         }

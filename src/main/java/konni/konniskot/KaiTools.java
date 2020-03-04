@@ -12,6 +12,7 @@ import zedly.zbot.BlockFace;
 import zedly.zbot.ConcurrentLinkedQueue;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
+import zedly.zbot.event.SlotUpdateEvent;
 
 /**
  *
@@ -61,6 +62,16 @@ public class KaiTools {
         return null;
     }
 
+    public static boolean checkIfBlocksAbove(int x, int y, int z, int maxsearchheight) {
+        for (int Y = y; y <= maxsearchheight; y++) {
+            Location scanloc = new Location(x, Y, z);
+            if (Main.self.getEnvironment().getBlockAt(scanloc).getType()!=Material.AIR) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void CraftFullBlock(Material mat, Location tessvor, Location tessdone, Location craft, BlockingAI ai) throws InterruptedException {
 
         while (InventoryUtil.countFullStacks(mat, 9, 44) < 9) {
@@ -87,29 +98,27 @@ public class KaiTools {
     }
 
     public static void CraftFullBlockSpeed(Material mat, Location tessvor, Location tessdone, Location craft, BlockingAI ai) throws InterruptedException {
-        ai.openContainer(craft);
-        while (true) {
-
-            int slotsToGet = InventoryUtil.countFreeStorageSlots(true, false);
-            for (int i = 0; i < slotsToGet; i++) {
-                Main.self.clickBlock(tessvor);
-            }
+        while (InventoryUtil.countFullStacks(mat, 9, 44) < 9) {
+            Main.self.clickBlock(tessvor);
             ai.tick();
+        }
 
-            int staticOffset = Main.self.getInventory().getStaticOffset();
-            for (int crafting = 1; crafting <= 9; crafting++) {
-                for (int local = staticOffset; local < staticOffset + 36; local++) {
-                    if (Main.self.getInventory().getSlot(local) != null
-                            && Main.self.getInventory().getSlot(local).getType() == mat) {
-                        ai.transferItem(local, crafting);
-                        // Main.self.clickBlock(tessvor);
-                        break;
-                    }
+        ai.openContainer(craft);
+        int staticOffset = Main.self.getInventory().getStaticOffset();
+        for (int crafting = 1; crafting <= 9; crafting++) {
+            for (int local = staticOffset; local < staticOffset + 36; local++) {
+                if (Main.self.getInventory().getSlot(local) != null
+                        && Main.self.getInventory().getSlot(local).getType() == mat) {
+                    ai.transferItem(local, crafting);
+                    Main.self.clickBlock(tessvor);
+
+                    break;
                 }
             }
-            Main.self.getInventory().click(0, 1, 0);
-            fillTesseract(tessdone);
         }
+        Main.self.getInventory().click(0, 1, 0);
+        ai.closeContainer();
+        fillTesseract(tessdone);
     }
 
     public static Location BFSScan(Predicate<Location> pred, int x, int y, int z, int viewrange) {
@@ -155,6 +164,24 @@ public class KaiTools {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public static void CraftFullBlockSuper(String recipeId, Material matvor, Location tessvor, Location tessdone, Location craft, BlockingAI ai) throws InterruptedException {
+        ai.openContainer(craft);
+        Main.self.recipeBookStatus(true, false, true, false, true, false, true, false);
+        while (true) {
+            int slotsToGet = 11 - InventoryUtil.countFullStacks(matvor, 9, 44);
+            for (int i = 0; i < slotsToGet; i++) {
+                Main.self.clickBlock(tessvor);
+            }
+            Main.self.requestRecipe(recipeId, true);
+            ai.waitForEvent(SlotUpdateEvent.class, (e) -> {
+                return e.getSlotId() == 0;
+            }, 5000);
+            Main.self.getInventory().click(0, 1, 0);
+            fillTesseract(tessdone);
+            ai.tick();
         }
     }
 
