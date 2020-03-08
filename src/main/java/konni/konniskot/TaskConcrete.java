@@ -153,11 +153,11 @@ public class TaskConcrete extends Task {
 
                         if (powder.contains(Main.self.getEnvironment().getBlockAt(CONCRETE_FARM_LOC).getType())) {
                             Main.self.selectSlot(0);
-                            ai.breakBlock(CONCRETE_FARM_LOC, 400);
+                            ai.breakBlock(CONCRETE_FARM_LOC, 200);
                             concretemined++;
                             System.out.println("concretemined " + concretemined);
                             neededpowder--;
-                            ai.tick();
+                            
                             Main.self.selectSlot(1);
                             ai.tick();
                             if (concretemined != goal) {
@@ -173,7 +173,7 @@ public class TaskConcrete extends Task {
                                 System.out.println("error at concrete location");
                             }
                         }
-                        ai.tick(3);
+                        ai.tick();
                     }
                 } else {
                     if (searchininventory()) {

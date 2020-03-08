@@ -21,9 +21,7 @@ import zedly.zbot.entity.Entity;
  */
 public class TaskTest extends Task {
  
-    private static final Location craftingbench = new Location(296, 125, -8720).centerHorizontally();
-    private static final Location nuggetTesseract = new Location(295, 126, -8719).centerHorizontally();
-    private static final Location ingotTesseract = new Location(294, 126, -8720).centerHorizontally();
+   
    
     public TaskTest() {
         super(100);
@@ -33,9 +31,10 @@ public class TaskTest extends Task {
     public void run() {
 
         try {
-            System.out.println("Tasktest start");
-            ai.tick();
-            KaiTools.CraftFullBlockSpeed(Material.GOLD_NUGGET, nuggetTesseract, ingotTesseract, craftingbench, ai);
+          ai.tick();
+          
+          
+          
         } catch (InterruptedException ex) {
 
         }

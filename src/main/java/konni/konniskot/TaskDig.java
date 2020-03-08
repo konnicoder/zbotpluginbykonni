@@ -33,7 +33,7 @@ public class TaskDig extends Task {
     public int sliceheight;
 
     public TaskDig(int x1, int y1, int z1, int x2, int y2, int z2, int sliceheight, int mode) {
-        super(10);
+        super(12);
         this.sliceheight = sliceheight;
         anker1 = new Location(x1, y1, z1).centerHorizontally();
         anker2 = new Location(x2, y2, z2).centerHorizontally();
@@ -51,14 +51,29 @@ public class TaskDig extends Task {
     public void run() {
         System.out.println("starting TaskDig");
         System.out.println("sliceheight set to: " + sliceheight);
-
-        for (int xachsenpunkt = X; xachsenpunkt > X2; xachsenpunkt = xachsenpunkt - sliceskip) {
-            for (int zachsenpunkt = Z; zachsenpunkt < Z2; zachsenpunkt++) {
+        try {
+            ai.navigateTo(anker1);
+        } catch (InterruptedException ex) {
+           
+        }
+        for (int xachsenpunkt = X; xachsenpunkt > X2; xachsenpunkt = xachsenpunkt - sliceskip * 2) {
+            for (int zachsenpunkt = Z; zachsenpunkt <= Z2; zachsenpunkt++) {
                 try {
                     experiment(xachsenpunkt, zachsenpunkt);
                 } catch (InterruptedException ex) {
 
                 }
+            }
+            if (xachsenpunkt - sliceskip < X2) {
+                break;
+            }
+            for (int zachsenpunkt = Z2; zachsenpunkt >= Z; zachsenpunkt--) {
+                try {
+                    experiment(xachsenpunkt - sliceskip, zachsenpunkt);
+                } catch (InterruptedException ex) {
+
+                }
+
             }
 
         }
@@ -72,11 +87,13 @@ public class TaskDig extends Task {
         Location walk = new Location(x, Y, z).centerHorizontally();
         Location laseraim = new Location(x, Y + 3, z);
         for (int r = 0; r < sliceheight; r++) {
-            Material mat = Main.self.getEnvironment().getBlockAt(x, Y + 3 + r, z).getType();
+            Material mat = Main.self.getEnvironment().getBlockAt(x, Y + 2 + r, z).getType();
             if (mat == Material.AIR || mat == Material.CAVE_AIR || mat == Material.VOID_AIR) {
                 continue;
             }
-            ai.moveTo(walk);
+            if (Main.self.getLocation().distanceTo(walk) > 0.1) {
+                ai.moveTo(walk);
+            }
             Main.self.lookAt(0, -89);
             ai.tick();
             Main.self.placeBlock(laseraim, BlockFace.EAST);

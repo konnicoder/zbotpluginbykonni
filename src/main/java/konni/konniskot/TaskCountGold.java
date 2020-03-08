@@ -5,18 +5,13 @@
  */
 package konni.konniskot;
 
-import java.util.ConcurrentModificationException;
-import zedly.zbot.BlockFace;
-import zedly.zbot.EntityType;
 import zedly.zbot.Location;
-import zedly.zbot.Material;
-import zedly.zbot.entity.Entity;
 
 /**
  *
  * @author Konstantin
  */
-public class TaskCraftGoldingots extends Task {
+public class TaskCountGold extends Task {
 
     private static final Location craftingbench = new Location(295, 130, -8720).centerHorizontally();
     private static final Location walk = new Location(297, 130, -8718).centerHorizontally();
@@ -27,32 +22,27 @@ public class TaskCraftGoldingots extends Task {
     private static final Tesseract ingotTesseractfinal = new Tesseract(295, 132, -8721);
     private static final Tesseract ingotTesseractdropper = new Tesseract(300, 132, -8718);
 
-    private boolean verbose;
-    private int repeats;
+    private static final Tesseract Goldblocktesseract = new Tesseract(299, 132, -8721);
 
-    public TaskCraftGoldingots(boolean verbose) {
+    public TaskCountGold() {
         super(100);
-        this.verbose = verbose;
+
     }
 
     public void run() {
-
         int nuggetsinpipeline = (int) (nuggetTesseract1.getAmount() + nuggetTesseract2.getAmount() + nuggetTesseract3.getAmount() + nuggetTesseractsmelter.getAmount());
-        int ingotsinpipeline = (int) ingotTesseractdropper.getAmount();
-        System.out.println("Nuggets in pipeline: " + nuggetsinpipeline + " = " + nuggetsinpipeline / 64 + " Stacks");
-        System.out.println("Ingots in pipeline: " + ingotsinpipeline + " = " + ingotsinpipeline / 64 + " Stacks");
+        int ingotsinpipeline = (int) (ingotTesseractdropper.getAmount() + ingotTesseractfinal.getAmount());
+        Main.self.sendChat("Nuggets in pipeline: " + nuggetsinpipeline + " = " + nuggetsinpipeline / 64 + " Stacks");
+        Main.self.sendChat("Ingots in pipeline: " + ingotsinpipeline + " = " + ingotsinpipeline / 64 + " Stacks");
         int totalnuggetsinpipeline = nuggetsinpipeline + ingotsinpipeline * 9;
-        System.out.println("Total Nuggets in Pipeline: "+totalnuggetsinpipeline+" = "+totalnuggetsinpipeline / 64 + " Stacks");
-    
+        
 
-    
-        
-        
+        int goldblockstotal = (int) Goldblocktesseract.getAmount();
+        int goldafteradding = goldblockstotal * 81 + totalnuggetsinpipeline;
+        Main.self.sendChat("Goldblocks before adding: " + goldblockstotal + " = " + goldblockstotal / 64 + " Stacks");
+        Main.self.sendChat("Goldblocks after adding: " + goldafteradding / 81 + " = " + (goldafteradding / 81) / 64 + " Stacks");
+        Main.self.sendChat("Total Nuggets: " + goldafteradding + " = " + (goldafteradding / 64) + " Stacks");
+
     }
 
-    public void cancel() {
-
-        System.out.println("miauuu");
-
-    }
 }

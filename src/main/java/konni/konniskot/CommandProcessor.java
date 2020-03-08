@@ -21,7 +21,7 @@ import zedly.zbot.BlockFace;
 class CommandProcessor {
 
     private static TaskCraftGoldingots goldingotcraft;
-    private static TaskCraftGoldblocks goldblockcraft;
+
     private static TaskCraftKelpBlocks craftkelpblocks;
     private static TaskGrindpigmen pigmentask;
     private static final File scrambleComplimentFile = new File(Main.instance.getDataFolder(), "compliments.txt");
@@ -64,6 +64,9 @@ class CommandProcessor {
 
         }
         switch (args[0]) {
+            case "floor":
+                new TaskFloor().start();
+                break;
 
             case "dig":
                 if (args.length == 1) {
@@ -82,10 +85,21 @@ class CommandProcessor {
                 }
 
                 break;
+
+            case "strip":
+                new TaskStripMine().start();
+                break;
+
+            case "pk":
+                new TaskConvertPumpkins().start();
+                break;
+
             case "mode":
+
                 Main.self.sneak(true);
                 Main.self.placeBlock(Main.self.getLocation(), BlockFace.EAST);
                 Main.self.sneak(false);
+
                 break;
 
             case "afk":
@@ -207,11 +221,13 @@ class CommandProcessor {
             case "extract_books":
                 new TaskExtractBooks().start();
                 break;
+                
+            case "count":
+                new TaskCountGold().start();
+                break;
 
             case "craft_gold":
-                goldingotcraft = new TaskCraftGoldingots(true);
-                goldingotcraft.start();
-                Main.self.sendChat("crafting goldingots");
+                new TaskCraftGoldingots(false).start();
                 break;
 
             case "craft_gold_stop":
@@ -224,8 +240,7 @@ class CommandProcessor {
                 break;
 
             case "craft_goldblocks":
-                goldblockcraft = new TaskCraftGoldblocks();
-                goldblockcraft.start();
+                new TaskCraftGoldblocks().start();
                 break;
 
             case "inventory":

@@ -18,9 +18,9 @@ import zedly.zbot.Material;
 public class TaskCraftKelpBlocks extends Task {
 
     private static final Location CRAFING_LOC = new Location(255, 137, -8599).centerHorizontally();
-    private static final Location TESS_PRECRAFT_LOC = new Location(256, 137, -8599).centerHorizontally();
+    private static final Tesseract TESS_PRECRAFT_LOC = new Tesseract(256, 137, -8599);
     private static final Location CRAFTINGBENCH = new Location(255, 137, -8600).centerHorizontally();
-    private static final Location TESS_AFTERCRAFT_LOC = new Location(255, 137, -8598).centerHorizontally();
+    private static final Tesseract TESS_AFTERCRAFT_LOC = new Tesseract(255, 137, -8598);
 
     private static final Location waypoint1 = new Location(229, 137, -8711).centerHorizontally();
     private static final Location waypoint2 = new Location(229, 137, -8631).centerHorizontally();
@@ -33,7 +33,7 @@ public class TaskCraftKelpBlocks extends Task {
     public TaskCraftKelpBlocks(int tesseractfilllevel, boolean verbose) {
         super(100);
         this.verbose = verbose;
-        tesseractfill = tesseractfilllevel;
+        tesseractfill = tesseractfilllevel / 9;
     }
 
     public void run() {
@@ -57,7 +57,7 @@ public class TaskCraftKelpBlocks extends Task {
                 ai.moveTo(CRAFING_LOC);
                 ai.tick();
             }
-          KaiTools.CraftFullBlockSuper("dried_kelp_block",Material.DRIED_KELP, TESS_PRECRAFT_LOC, TESS_AFTERCRAFT_LOC, CRAFTINGBENCH, ai);
+            KaiTools.CraftFullBlockSuper("dried_kelp_block", Material.DRIED_KELP, TESS_PRECRAFT_LOC, TESS_AFTERCRAFT_LOC, CRAFTINGBENCH, ai);
 //            for (int i = cycles; i > 0; i--) {
 //
 //                //KaiTools.CraftFullBlockSuper("dried_kelp_block", TESS_PRECRAFT_LOC, TESS_AFTERCRAFT_LOC, CRAFTINGBENCH, ai);

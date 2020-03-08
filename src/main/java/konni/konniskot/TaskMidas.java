@@ -21,9 +21,9 @@ public class TaskMidas extends Task {
 
     private static final Location home = new Location(2726, 181, -8574).centerHorizontally();
     private static final Location CRAFT_LOC = new Location(2726, 172, -8573).centerHorizontally();
-    private static final Location NUGGET_TESS_LOC = new Location(2726, 173, -8572).centerHorizontally();
-    private static final Location INGOT_TESS_LOC = new Location(2727, 173, -8573).centerHorizontally();
-    private static final Location GOLDBLOCK_TESS_LOC = new Location(2727, 172, -8573).centerHorizontally();
+    private static final Tesseract NUGGET_TESS_LOC = new Tesseract(2726, 173, -8572);
+    private static final Tesseract INGOT_TESS_LOC = new Tesseract(2727, 173, -8573);
+    private static final Tesseract GOLDBLOCK_TESS_LOC = new Tesseract(2727, 172, -8573);
     private static final Location CRAFTINGBENCH_LOC = new Location(2728, 172, -8572).centerHorizontally();
 
     private int mode = 0;
@@ -44,7 +44,7 @@ public class TaskMidas extends Task {
             if (mode == 2) {
                 ai.moveTo(CRAFT_LOC);
                 Main.self.sendChat("crafting goldingots");
-                KaiTools.CraftFullBlockSuper("gold_ingot_from_nuggets", Material.GOLD_NUGGET, NUGGET_TESS_LOC, INGOT_TESS_LOC, CRAFTINGBENCH_LOC, ai);             
+                KaiTools.CraftFullBlockSuper("gold_ingot_from_nuggets", Material.GOLD_NUGGET, NUGGET_TESS_LOC, INGOT_TESS_LOC, CRAFTINGBENCH_LOC, ai);
             }
             if (mode == 3) {
                 ai.moveTo(CRAFT_LOC);

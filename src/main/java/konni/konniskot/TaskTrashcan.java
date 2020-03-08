@@ -32,6 +32,7 @@ public class TaskTrashcan extends Task {
             ai.moveTo(trashablegen);
             ai.tick(20);
             System.out.println("Waitdone-deposit Trash");
+            ai.tick();
             dumpTrash();
 
         } catch (InterruptedException trashfail) {

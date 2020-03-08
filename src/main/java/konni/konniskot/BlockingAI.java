@@ -153,8 +153,10 @@ public class BlockingAI implements Runnable {
         tick();
     }
 
-    public <T extends Event> boolean waitForEvent(final Class<T> eventClass, Predicate<T> eventFilter, int timeoutMillis) throws InterruptedException {
+    public <T extends Event> T waitForEvent(final Class<T> eventClass, Predicate<T> eventFilter, int timeoutMillis) throws InterruptedException {
         long startTime = System.currentTimeMillis();
+        final Event [] event = new Event [1];
+              
         final BlockingAI ai = this;
         final AtomicBoolean detected = new AtomicBoolean();
         detected.set(false);
@@ -164,6 +166,7 @@ public class BlockingAI implements Runnable {
             public void listen(T hue) {
                 if (eventClass.isInstance(hue) && eventFilter.test(hue)) {
                     detected.set(true);
+                    event [0] = hue;
                     Main.self.unregisterEvents(this);
                     synchronized (lock) {
                         lock.notifyAll();
@@ -177,19 +180,19 @@ public class BlockingAI implements Runnable {
                 lock.wait();
             }
             if (detected.get()) {
-                return true;
+                return (T) event[0];
             } else if (System.currentTimeMillis() - startTime > timeoutMillis) {
-                return false;
+                return null;
             }
         }
     }
 
     public boolean openContainer(int x, int y, int z) throws InterruptedException {
         Main.self.placeBlock(x, y, z, BlockFace.NORTH);
-        if (!waitForEvent(WindowOpenFinishEvent.class, 5000)) {
+        if (waitForEvent(WindowOpenFinishEvent.class, 5000)==null) {
             return false;
         }
-        while (waitForEvent(SlotUpdateEvent.class, 250)) {
+        while (waitForEvent(SlotUpdateEvent.class, 250)!=null) {
         }
         return true;
     }
@@ -202,7 +205,7 @@ public class BlockingAI implements Runnable {
         //final int expectedSlot = Main.self.getInventory().getSelectedSlot() + 9;
         Main.self.closeWindow();
         if (Main.self.getInventory().changed()) {
-            boolean closed = waitForEvent(SlotUpdateEvent.class, 5000);
+            boolean closed = waitForEvent(SlotUpdateEvent.class, 5000)!=null;
             return closed;
         }
         tick();
@@ -258,7 +261,7 @@ public class BlockingAI implements Runnable {
         return confirm.get();
     }
 
-    public <T extends Event> boolean waitForEvent(final Class<T> eventClass, int timeoutMillis) throws InterruptedException {
+    public <T extends Event> T waitForEvent(final Class<T> eventClass, int timeoutMillis) throws InterruptedException {
         return waitForEvent(eventClass, (e) -> true, timeoutMillis);
     }
 

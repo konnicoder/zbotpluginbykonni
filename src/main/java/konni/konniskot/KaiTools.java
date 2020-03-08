@@ -12,6 +12,7 @@ import zedly.zbot.BlockFace;
 import zedly.zbot.ConcurrentLinkedQueue;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
+import zedly.zbot.event.ChatEvent;
 import zedly.zbot.event.SlotUpdateEvent;
 
 /**
@@ -21,9 +22,6 @@ import zedly.zbot.event.SlotUpdateEvent;
 public class KaiTools {
 
     public static Location Scan(Material searchmat, int x, int y, int z, int yscanrange, int searchrange) {
-        int CenterPointX = x;
-        int CenterPointY = y;
-        int CenterPointZ = z;
 
         int ScanAnker1X = x + 1;
         int ScanAnker1Y = y + yscanrange;
@@ -62,10 +60,48 @@ public class KaiTools {
         return null;
     }
 
+    public static Location ScanArea(Material searchmat, int x1, int y1, int z1, int x2, int y2, int z2) {
+
+        int durchsuchte_bloecke = 0;
+        for (int yachse = y1; yachse > y2; yachse--) {
+            for (int xachse = x1; xachse > x2; xachse--) {
+                for (int zachse = z1; zachse < z2; zachse++) {
+                    if (Main.self.getEnvironment().getBlockAt(x2, y2, z2).getType() == searchmat) {
+
+                        return new Location(xachse, yachse, zachse);
+                    }
+                }
+            }
+        }
+
+        System.out.println("blöcke durchsucht: " + durchsuchte_bloecke);
+
+        return null;
+    }
+
+    public static boolean modeSelect(String mode, BlockingAI ai) throws InterruptedException {
+        while (true) {
+            Main.self.sneak(true);
+            Main.self.placeBlock(Main.self.getLocation(), BlockFace.EAST);
+            Main.self.sneak(false);
+            ChatEvent e = ai.waitForEvent(ChatEvent.class, 5000);
+            if (e == null) {
+                System.out.println("Error in select mode");
+                return false;
+            }
+            if (e.getMessage().matches("^(3x Wide|3x Long|3x Tall|Ore|1x Normal) Mode$")) {
+                if (e.getMessage().toLowerCase().contains(mode.toLowerCase())) {
+                    return true;
+                }
+            }
+
+        }
+    }
+
     public static boolean checkIfBlocksAbove(int x, int y, int z, int maxsearchheight) {
         for (int Y = y; y <= maxsearchheight; y++) {
             Location scanloc = new Location(x, Y, z);
-            if (Main.self.getEnvironment().getBlockAt(scanloc).getType()!=Material.AIR) {
+            if (Main.self.getEnvironment().getBlockAt(scanloc).getType() != Material.AIR) {
                 return true;
             }
         }
@@ -167,20 +203,20 @@ public class KaiTools {
         }
     }
 
-    public static void CraftFullBlockSuper(String recipeId, Material matvor, Location tessvor, Location tessdone, Location craft, BlockingAI ai) throws InterruptedException {
+    public static void CraftFullBlockSuper(String recipeId, Material matvor, Tesseract tessvor, Tesseract tessdone, Location craft, BlockingAI ai) throws InterruptedException {
         ai.openContainer(craft);
         Main.self.recipeBookStatus(true, false, true, false, true, false, true, false);
-        while (true) {
+        while (tessvor.getAmount() > 9 * 64) {
             int slotsToGet = 11 - InventoryUtil.countFullStacks(matvor, 9, 44);
             for (int i = 0; i < slotsToGet; i++) {
-                Main.self.clickBlock(tessvor);
+                Main.self.clickBlock(tessvor.getLocation());
             }
             Main.self.requestRecipe(recipeId, true);
             ai.waitForEvent(SlotUpdateEvent.class, (e) -> {
                 return e.getSlotId() == 0;
             }, 5000);
             Main.self.getInventory().click(0, 1, 0);
-            fillTesseract(tessdone);
+            fillTesseract(tessdone.getLocation());
             ai.tick();
         }
     }
