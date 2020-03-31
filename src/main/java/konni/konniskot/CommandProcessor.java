@@ -5,6 +5,7 @@
  */
 package konni.konniskot;
 
+import konni.konniskot.BotEdit.TaskDig;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -64,8 +65,45 @@ class CommandProcessor {
 
         }
         switch (args[0]) {
-            case "floor":
-                new TaskFloor().start();
+            case "grind_uardian":
+                new TaskGuardianGrinder().start();
+                break;
+
+            case "craftsl":
+                new TaskCraftSeaLanterns().start();
+                break;
+                
+            case "pfloor":
+                if (args.length == 1) {
+                    Main.self.sendChat("(prefix) pfloor (x1) (y1) (z1) (x2) (y2) (z2)");
+                }
+                if (args.length == 7) {
+                    int xc1 = Integer.parseInt(args[1]);
+                    int yc1 = Integer.parseInt(args[2]);
+                    int zc1 = Integer.parseInt(args[3]);
+                    int xc2 = Integer.parseInt(args[4]);
+                    int yc2 = Integer.parseInt(args[5]);
+                    int zc2 = Integer.parseInt(args[6]);
+
+                    new TaskFloorPerimiter(xc1, yc1, zc1, xc2, yc2, zc2).start();
+                }
+                break;
+
+            case "pfloorsl":
+                if (args.length == 1) {
+                    Main.self.sendChat("(prefix) pfloorsl (x1) (y1) (z1) (x2) (y2) (z2)");
+                }
+                if (args.length == 7) {
+                    int xc1 = Integer.parseInt(args[1]);
+                    int yc1 = Integer.parseInt(args[2]);
+                    int zc1 = Integer.parseInt(args[3]);
+                    int xc2 = Integer.parseInt(args[4]);
+                    int yc2 = Integer.parseInt(args[5]);
+                    int zc2 = Integer.parseInt(args[6]);
+
+                    new TaskFloorSL(xc1, yc1, zc1, xc2, yc2, zc2).start();
+                }
+               
                 break;
 
             case "dig":
@@ -85,6 +123,14 @@ class CommandProcessor {
                 }
 
                 break;
+                
+            case "see":
+                   int x1 = Integer.parseInt(args[1]);
+                    int y1 = Integer.parseInt(args[2]);
+                    int z1 = Integer.parseInt(args[3]);
+                    new TaskSee(x1,y1,z1).start();
+                    
+                    break;
 
             case "strip":
                 new TaskStripMine().start();
@@ -144,23 +190,16 @@ class CommandProcessor {
 
             case "kelp":
                 if (args.length == 1) {
-                    Main.self.sendChat("(prefix) kelp (amount in Tesseract) (verbose)");
+                    Main.self.sendChat("(prefix) kelp (verbose)");
                 }
                 if (args.length == 2) {
-                    int x = Integer.parseInt(args[1]);
-                    craftkelpblocks = new TaskCraftKelpBlocks(x, false);
-                    craftkelpblocks.start();
-                }
-                if (args.length == 3) {
-                    switch (args[2]) {
-                        case "-v":
-                            int x = Integer.parseInt(args[1]);
-                            craftkelpblocks = new TaskCraftKelpBlocks(x, true);
+                    switch (args[1]) {
+                        case "-v":          
+                            craftkelpblocks = new TaskCraftKelpBlocks( true);
                             craftkelpblocks.start();
                             break;
                     }
                 }
-
                 break;
 
             case "trash":
@@ -221,7 +260,7 @@ class CommandProcessor {
             case "extract_books":
                 new TaskExtractBooks().start();
                 break;
-                
+
             case "count":
                 new TaskCountGold().start();
                 break;

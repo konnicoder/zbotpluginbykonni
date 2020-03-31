@@ -30,10 +30,10 @@ public class TaskCraftKelpBlocks extends Task {
     private int tesseractfill;
     private int cycles;
 
-    public TaskCraftKelpBlocks(int tesseractfilllevel, boolean verbose) {
+    public TaskCraftKelpBlocks( boolean verbose) {
         super(100);
         this.verbose = verbose;
-        tesseractfill = tesseractfilllevel / 9;
+        
     }
 
     public void run() {

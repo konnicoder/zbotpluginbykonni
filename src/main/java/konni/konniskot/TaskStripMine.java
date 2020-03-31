@@ -8,9 +8,11 @@ package konni.konniskot;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static konni.konniskot.KaiTools.BFSScan;
 import zedly.zbot.BlockFace;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
+import zedly.zbot.environment.Block;
 
 /**
  *
@@ -38,46 +40,30 @@ public class TaskStripMine extends Task {
             if (checkForLava(x, Y, z) == true) {
                 Main.self.sendChat("Lava detected");
             }
+            for (int xachse = 0; xachse < 100; xachse = xachse + 3) {
+            }
+
         } catch (InterruptedException ex) {
         }
 
-//         while (true) {
-//                KaiTools.modeSelect("tall", ai);
-//                System.out.println("done tall");
-//                ai.tick(20);
-//                KaiTools.modeSelect("ore", ai);
-//                System.out.println("done ore");
-//                ai.tick(20);
-//            }
-//        
-//
-//        }
-//        try {
-//            
-//            
-//            Location aktuell = Main.self.getLocation();
-//            int x = (int) aktuell.getX();
-//            Y = (int) aktuell.getY();
-//            int z = (int) aktuell.getZ();
-//
-//            for (int X = x; x < x + 1000; x++) {
-//                
-//                
-//                Location walk = new Location(x, Y, z).centerHorizontally();
-//
-//                ai.moveTo(walk);
-//
-//                ai.tick();
-//                doRightSide(X, z);
-//                ai.tick();
-//                doLeftSide(X, z);
-//                ai.tick();
-//                
-//                
-//            }
-//        } catch (InterruptedException ex) {
-//
-//        }
+//Block testblock= Main.self.getEnvironment().getBlockAt(BFSScan(blabla));
+//KaiTools.isVisible(testblock);
+    }
+
+    public void doTunnel(int xcoord, int ycoord, int zcoord) throws InterruptedException {
+        int x = xcoord;
+        int y = ycoord;
+        int z = zcoord;
+        while (true) {
+            if (checkForLava(x, y, z) == false) {
+                KaiTools.modeSelect("tall", ai);
+                ai.tick();
+                Main.self.breakBlock(x, y + 1, z + 1);
+            } else {
+                break;
+            }
+           
+        }
     }
 
     public boolean checkForLava(int x, int y, int z) {
@@ -86,35 +72,13 @@ public class TaskStripMine extends Task {
         int z1 = z - 1;
 
         int x2 = x - 1;
-        int y2 = y;
+        int y2 = y - 1;
         int z2 = z + 1;
 
         if (KaiTools.ScanArea(Material.LAVA, x1, y1, z1, x2, y2, z2) != null) {
             return true;
         }
         return false;
-    }
-
-    public void doRightSide(int x, int z) throws InterruptedException {
-
-        for (int i = 0; i < 15; i++) {
-
-            Main.self.lookAt(0, 0);
-            ai.tick();
-
-            Main.self.placeBlock(Main.self.getLocation(), BlockFace.EAST);
-            ai.tick();
-        }
-    }
-
-    public void doLeftSide(int x, int z) throws InterruptedException {
-        for (int i = 0; i < 15; i++) {
-
-            Main.self.lookAt(180, 0);
-            ai.tick();
-            Main.self.placeBlock(Main.self.getLocation(), BlockFace.EAST);
-            ai.tick();
-        }
     }
 
     static {

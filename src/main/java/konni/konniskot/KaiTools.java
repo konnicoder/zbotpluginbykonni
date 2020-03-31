@@ -8,12 +8,18 @@ package konni.konniskot;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.function.Predicate;
+import net.minecraft.server.NBTTagCompound;
 import zedly.zbot.BlockFace;
 import zedly.zbot.ConcurrentLinkedQueue;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
+import zedly.zbot.environment.Block;
 import zedly.zbot.event.ChatEvent;
 import zedly.zbot.event.SlotUpdateEvent;
+import zedly.zbot.inventory.ItemStack;
+import zedly.zbot.util.CartesianVector;
+import zedly.zbot.util.SphericalVector;
+import zedly.zbot.util.Vector;
 
 /**
  *
@@ -58,6 +64,244 @@ public class KaiTools {
         System.out.println("blöcke durchsucht: " + durchsuchte_bloecke);
 
         return null;
+    }
+
+    public static Block RayCast(Location origin, Vector aim, double radius, Predicate<Block> searchmethod) {
+        double x = origin.getX();
+        double y = origin.getY();
+        double z = origin.getZ();
+
+        aim = aim.normalize();
+        double dx = aim.getX();
+        double dy = aim.getY();
+        double dz = aim.getZ();
+
+        double stepX = Math.signum(dx);
+        double stepY = Math.signum(dy);
+        double stepZ = Math.signum(dz);
+
+        double tMaxX = intbound(origin.getX(), dx);
+        double tMaxY = intbound(origin.getY(), dy);
+        double tMaxZ = intbound(origin.getZ(), dz);
+
+        double tDeltaX = stepX / dx;
+        double tDeltaY = stepY / dy;
+        double tDeltaZ = stepZ / dz;
+
+        if (dx == 0 && dy == 0 && dz == 0) {
+            throw new IllegalArgumentException("Raycast in zero direction!");
+        }
+
+        radius = radius / Math.sqrt(dx * dx + dy * dy + dz * dz);
+        ///HIER DER FEHLER
+        Location testblocloc = new Location(x, y, z);
+        Block testblock = Main.self.getEnvironment().getBlockAt(testblocloc);
+
+        while (testblock.isLoaded()) {
+            testblocloc = new Location(x, y, z);
+            testblock = Main.self.getEnvironment().getBlockAt(testblocloc);
+            if (searchmethod.test(testblock)) {
+                return testblock;
+            }
+//            Location testloc = new Location(x, y, z);
+//            if (Main.self.getEnvironment().getBlockAt(testloc).getType() != Material.AIR) {
+//                Location goal = new Location(x, y, z).centerHorizontally();
+//                Main.self.sendChat("block found at: " + goal);
+//                Block foundblock = Main.self.getEnvironment().getBlockAt(goal);
+//                Main.self.sendChat("" + foundblock);
+//                return foundblock;
+//            }
+            if (tMaxX < tMaxY) {
+                if (tMaxX < tMaxZ) {
+                    if (tMaxX > radius) {
+                        break;
+                    }
+
+                    x += stepX;
+
+                    tMaxX += tDeltaX;
+
+                } else {
+                    if (tMaxZ > radius) {
+                        break;
+                    }
+                    z += stepZ;
+                    tMaxZ += tDeltaZ;
+
+                }
+            } else {
+                if (tMaxY < tMaxZ) {
+                    if (tMaxY > radius) {
+                        break;
+                    }
+                    y += stepY;
+                    tMaxY += tDeltaY;
+
+                } else {
+
+                    if (tMaxZ > radius) {
+                        break;
+                    }
+                    z += stepZ;
+                    tMaxZ += tDeltaZ;
+                }
+            }
+            System.out.println(x + " " + y + " " + z);
+        }
+        return null;
+    }
+
+    public static boolean isVisible(Block block) {
+        System.out.println("zielblock" + block);
+        System.out.println("isvisible raycast" + RayCast(Main.self.getLocation(), block.getLocation(), 30, (b) -> {
+            return b.getType() != Material.AIR && b.getType() != Material.CAVE_AIR;
+        }));
+        if (RayCast(Main.self.getLocation(), block.getLocation(), 30, (b) -> {
+            return b.getType() != Material.AIR && b.getType() != Material.CAVE_AIR;
+        }) == block) {
+            return true;
+
+        } else {
+            return false;
+        }
+
+//        return RayCast(Main.self.getLocation(), block.getLocation(), 30, (b) -> {
+//            return b.getType() != Material.AIR && b.getType() != Material.CAVE_AIR;
+//        }) == block;
+    }
+
+    public static boolean isVis(Block block, Location loc) {
+        System.out.println("zielblock" + loc);
+        System.out.println("isvisible raycast" + RayCast(Main.self.getLocation(), loc, 30, (b) -> {
+            return b.getType() != Material.AIR && b.getType() != Material.CAVE_AIR;
+        }));
+        if (RayCast(Main.self.getLocation(), loc, 30, (b) -> {
+            return b.getType() != Material.AIR && b.getType() != Material.CAVE_AIR;
+        }) == block) {
+            return true;
+
+        } else {
+            return false;
+        }
+
+    }
+
+    public static Block RayCast(Location origin, double radius, Predicate<Block> searchmethod) {
+
+        SphericalVector aim = new SphericalVector(origin.getYaw() * Math.PI / 180.0, origin.getPitch() * Math.PI / 180.0, 1);
+        return RayCast(origin, aim, radius, searchmethod);
+    }
+
+    public static Block RayCast(Location origin, Location dest, double radius, Predicate<Block> searchmethod) {
+        Vector aim = origin.vectorTo(dest);
+
+        return RayCast(origin, aim, radius, searchmethod);
+    }
+
+    private static double intbound(double s, double ds) {
+        if (ds < 0) {
+            return intbound(-s, -ds);
+        } else {
+            s = modFloatPositive(s, 1);
+            return (1 - s) / ds;
+        }
+
+    }
+
+    private static double modFloatPositive(double value, double modulus) {
+        return modFloat((modFloat(value, modulus) + modulus), modulus);
+    }
+
+    private static double modFloat(double number, double modulus) {
+        int intFraction = (int) (number / modulus);
+        double remainder = number - intFraction * modulus;
+        return remainder;
+    }
+
+    public static boolean doesRayColideWithBlock(Location origin, Vector aim, Location testblock) {
+
+        double originX = origin.getX();
+        double originY = origin.getY();
+        double originZ = origin.getZ();
+
+        double testblockX = testblock.getBlockX();
+        double testblockY = testblock.getBlockY();
+        double testblockZ = testblock.getBlockZ();
+
+        double dx = aim.getX();
+        double dy = aim.getY();
+        double dz = aim.getZ();
+
+        double tminX = 0;
+        double tmaxX = 0;
+
+        double tminY = 0;
+        double tmaxY = 0;
+
+        double tminZ = 0;
+        double tmaxZ = 0;
+
+        if (dx == 0) {
+            if ((int) originX != (int) testblockX) {
+                return false;
+            }
+
+        }
+        if (dy == 0) {
+            if ((int) originY != (int) testblockY) {
+                return false;
+            }
+
+        }
+        if (dz == 0) {
+            if ((int) originZ != (int) testblockZ) {
+                return false;
+            }
+
+        }
+
+        tminX = (testblockX - originX) / dx;
+        tmaxX = (testblockX + 1 - originX) / dx;
+        if (tminX > tmaxX) {
+            double tpminx = tminX;
+            tminX = tmaxX;
+            tmaxX = tpminx;
+        }
+
+        tminY = (testblockY - originY) / dy;
+        tmaxY = (testblockY + 1 - originY) / dy;
+        if (tminY > tmaxY) {
+            double tpminy = tminY;
+            tminY = tmaxY;
+            tmaxY = tpminy;
+        }
+
+        tminZ = (testblockZ - originZ) / dz;
+        tmaxZ = (testblockZ + 1 - originZ) / dz;
+        if (tminZ > tmaxZ) {
+            double tpminz = tminZ;
+            tminZ = tmaxZ;
+            tmaxZ = tpminz;
+        }
+        double tmin = Math.max(Math.max(tminX, tminY), tminZ);
+
+        double tmax = Math.min(Math.max(tmaxX, tmaxY), tmaxZ);
+
+        return tmax > 0 && tmin < tmax;
+
+    }
+
+    public static Block rayCastNew(Location origin, Vector aim, double radius, Predicate<Block> searchmethod) {
+        Block miau = Main.self.getEnvironment().getBlockAt(BFSScan(
+                (loc) -> {
+                    return searchmethod.test(Main.self.getEnvironment().getBlockAt(loc));
+                },
+                (loc) -> {
+                    return doesRayColideWithBlock(origin, aim, loc);
+                },
+                origin.getBlockX(), origin.getBlockY(), origin.getBlockZ(), (int) radius));
+
+        return miau;
     }
 
     public static Location ScanArea(Material searchmat, int x1, int y1, int z1, int x2, int y2, int z2) {
@@ -157,7 +401,7 @@ public class KaiTools {
         fillTesseract(tessdone);
     }
 
-    public static Location BFSScan(Predicate<Location> pred, int x, int y, int z, int viewrange) {
+    public static Location BFSScan(Predicate<Location> pred, Predicate<Location> searchPred, int x, int y, int z, int viewrange) {
         HashSet<Location> searched_blocks = new HashSet<>();
         final BlockFace[] searchdirections = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
 
@@ -181,6 +425,10 @@ public class KaiTools {
                 if (relatives.distanceTo(origin) > viewrange) {
                     continue;
                 }
+                if (!searchPred.test(relatives)) {
+                    continue;
+                }
+
                 searched_blocks.add(relatives);
                 scanborder.add(relatives);
             }
@@ -195,12 +443,57 @@ public class KaiTools {
         }, x, y, z, viewrange);
     }
 
+    public static Location BFSScan(Predicate<Location> pred, int x, int y, int z, int viewrange) {
+        return BFSScan(pred, (b) -> {
+            return true;
+        }, x, y, z, viewrange);
+
+    }
+
     public static boolean testStackAvaliable(Material mat, int slot) {
         if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public static boolean lookInInventoryAndMove(Material mat, int targetslot, BlockingAI ai) throws InterruptedException {
+        for (int slot = 9; slot < 44; slot++) {
+            if (slot == targetslot) {
+                continue;
+            }
+            if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat) {
+                ai.swapItems(slot, targetslot);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean lookInDoubleChestAndMove(Material mat, int targetslot, BlockingAI ai) throws InterruptedException {
+        int goalslot = targetslot + 45;
+        for (int slot = 0; slot < 53; slot++) {
+            if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat) {
+                ai.transferItem(slot,goalslot);
+                ai.tick();
+                return true;
+            }
+        }
+        return false;
+    }
+    
+     public static boolean checkToolFullHealth() {
+        ItemStack is = Main.self.getInventory().getItemInHand();
+        if (is.getNbt() instanceof NBTTagCompound) {
+            NBTTagCompound nbt = (NBTTagCompound) is.getNbt();
+            int damage = nbt.getInteger("Damage");
+            
+            if (damage < 10) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void CraftFullBlockSuper(String recipeId, Material matvor, Tesseract tessvor, Tesseract tessdone, Location craft, BlockingAI ai) throws InterruptedException {
