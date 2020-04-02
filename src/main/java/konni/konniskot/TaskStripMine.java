@@ -62,7 +62,7 @@ public class TaskStripMine extends Task {
             } else {
                 break;
             }
-           
+
         }
     }
 
@@ -79,6 +79,26 @@ public class TaskStripMine extends Task {
             return true;
         }
         return false;
+    }
+
+    public void checkNeightbourBlocks(int x, int y, int z) throws InterruptedException {
+        
+        Location locup = new Location(x, y+1, z);
+        Location locdown = new Location(x, y-1, z);
+        Location locxpos = new Location(x+1,y,z);
+        Location locxneg = new Location(x-1,y,z);
+        Location loczpos = new Location(x,y,z+1);
+        Location loczneg = new Location(x,y,z-1);
+        KaiTools.modeSelect("ore", ai);
+        ai.tick();
+        if(ores.contains(Main.self.getEnvironment().getBlockAt(locup).getType())){
+        ai.breakBlock(locup, 200);    
+        }
+        if(ores.contains(Main.self.getEnvironment().getBlockAt(locdown).getType())){
+        ai.breakBlock(locdown, 200);    
+        }
+        
+
     }
 
     static {

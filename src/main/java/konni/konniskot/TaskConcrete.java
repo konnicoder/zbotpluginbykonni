@@ -76,6 +76,7 @@ public class TaskConcrete extends Task {
             neededpowder = goal;
 
             walkToWork();
+            
             ai.tick();
             Main.self.selectSlot(0);
 
@@ -120,12 +121,12 @@ public class TaskConcrete extends Task {
         return true;
     }
 
+//checks if powder is in definded powderchest and if so, gets 1 stack
     public boolean getPowderFromChest() throws InterruptedException {
-
         ai.moveTo(POWDER_CHEST_WALK);
         ai.tick();
         ai.openContainer(POWDER_CHEST_LOC);
-
+        // if no suitable powder is in chest, returns false
         if (KaiTools.lookInDoubleChestAndMove(colourpowder, powderslot, ai) == false) {
             ai.closeContainer();
             return false;

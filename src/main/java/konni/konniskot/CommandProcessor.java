@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import konni.konniskot.BotEdit.TaskPyramid;
 import konni.konniskot.BotEdit.TaskPyramidBFS;
+import konni.konniskot.BotEdit.TaskWallUp;
 import zedly.zbot.BlockFace;
 
 /**
@@ -104,6 +105,10 @@ class CommandProcessor {
                     new TaskFloorSL(xc1, yc1, zc1, xc2, yc2, zc2).start();
                 }
                
+                break;
+                
+            case "wall":
+                new TaskWallUp().start();
                 break;
 
             case "dig":
