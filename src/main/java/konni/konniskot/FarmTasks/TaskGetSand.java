@@ -3,10 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package konni.konniskot;
+package konni.konniskot.FarmTasks;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import konni.konniskot.InventoryUtil;
+import konni.konniskot.KaiTools;
+import konni.konniskot.Main;
+import konni.konniskot.Task;
 import net.minecraft.server.NBTTagCompound;
 import zedly.zbot.BlockFace;
 import zedly.zbot.Location;

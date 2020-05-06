@@ -5,6 +5,19 @@
  */
 package konni.konniskot;
 
+import konni.konniskot.FarmTasks.TaskConcrete;
+import konni.konniskot.FarmTasks.TaskExtractBooks;
+import konni.konniskot.FarmTasks.TaskConvertPumpkins;
+import konni.konniskot.BotEdit.TaskFloorSL;
+import konni.konniskot.BotEdit.TaskFloorPerimiter;
+import konni.konniskot.FarmTasks.TaskGetSand;
+import konni.konniskot.FarmTasks.TaskGrindpigmen;
+import konni.konniskot.FarmTasks.TaskGuardianGrinder;
+import konni.konniskot.FarmTasks.TaskStripMine;
+import konni.konniskot.FarmTasks.TaskStripMineReal;
+import konni.konniskot.Useful.TaskTrashcan;
+import konni.konniskot.FarmTasks.TaskCarrotFarmer;
+import konni.konniskot.Useful.TaskCheckInventory;
 import konni.konniskot.BotEdit.TaskDig;
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,19 +40,27 @@ class CommandProcessor {
     private static TaskCraftKelpBlocks craftkelpblocks;
     private static TaskGrindpigmen pigmentask;
     private static final File scrambleComplimentFile = new File(Main.instance.getDataFolder(), "compliments.txt");
+    private static final File scrambleInsultsFile = new File(Main.instance.getDataFolder(), "insults.txt");
     private static final ArrayList<String> compliments = new ArrayList<>();
+    private static final ArrayList<String> insults = new ArrayList<>();
     private static TaskGetSand taskgetsand;
     private String status = "-v";
 
     static void onCommand(String user, String command, boolean pm) throws Exception {
         String[] args = command.split(" ");
         loadComplimentsDictionary();
+        loadInsultsDictionary();
 
         switch (args[0]) {
 
-            case "Testt":
-
-                new TaskTest().start();
+            case "time":
+                int time = KaiTools.getDayTime();
+                if (time > 0 && time < 13500) {
+                    int minutesleft = 13500 - time;
+                    Main.self.sendChat("time left: " + minutesleft / 1000 + " minutes");
+                } else {
+                    Main.self.sendChat("nope.");
+                }
 
                 break;
 
@@ -59,6 +80,10 @@ class CommandProcessor {
                 String comp = compliments.get(Main.rnd.nextInt(compliments.size()));
                 Main.self.sendChat(comp);
                 break;
+            case "insult":
+                String ins = insults.get(Main.rnd.nextInt(insults.size()));
+                Main.self.sendChat(ins);
+                break;
 
         }
         if (!Main.admins.contains(user)) {
@@ -66,14 +91,43 @@ class CommandProcessor {
 
         }
         switch (args[0]) {
-            case "grind_uardian":
+            case "st":
+                if (args.length == 2){
+                    int dis = Integer.parseInt(args[1]);
+                new TaskStripMineReal(dis).start();
+                }
+                break;
+            case "carrot":
+                new TaskCarrotFarmer().start();
+                break;
+            case "tp":
+                Main.self.sendChat("/tpa " + user);
+                break;
+
+            case "tpa":
+                Main.self.sendChat("/tpaccept");
+                break;
+
+            case "grind_guardian":
                 new TaskGuardianGrinder().start();
+                break;
+
+            case "mine":
+                if (args.length == 1) {
+                    Main.self.sendChat("(prefix) mine (x) (y) (z)");
+                }
+                if (args.length == 4) {
+                    int x = Integer.parseInt(args[1]);
+                    int y = Integer.parseInt(args[2]);
+                    int z = Integer.parseInt(args[3]);
+                    new TaskTest(x, y, z).start();
+                }
                 break;
 
             case "craftsl":
                 new TaskCraftSeaLanterns().start();
                 break;
-                
+
             case "pfloor":
                 if (args.length == 1) {
                     Main.self.sendChat("(prefix) pfloor (x1) (y1) (z1) (x2) (y2) (z2)");
@@ -104,11 +158,25 @@ class CommandProcessor {
 
                     new TaskFloorSL(xc1, yc1, zc1, xc2, yc2, zc2).start();
                 }
-               
+
                 break;
-                
+            case "m":
+                if (args.length == 2) {
+                    int mode = Integer.parseInt(args[1]);
+                    new TaskMazeRunner(mode).start();
+                }
+
+                break;
+
             case "wall":
-                new TaskWallUp().start();
+                if (args.length == 1) {
+                    Main.self.sendChat("(prefix) wall (ytargetheight)");
+                }
+
+                if (args.length == 2) {
+                    int ytarget1 = Integer.parseInt(args[1]);
+                    new TaskWallUp(ytarget1, user).start();
+                }
                 break;
 
             case "dig":
@@ -128,14 +196,14 @@ class CommandProcessor {
                 }
 
                 break;
-                
+
             case "see":
-                   int x1 = Integer.parseInt(args[1]);
-                    int y1 = Integer.parseInt(args[2]);
-                    int z1 = Integer.parseInt(args[3]);
-                    new TaskSee(x1,y1,z1).start();
-                    
-                    break;
+                int x1 = Integer.parseInt(args[1]);
+                int y1 = Integer.parseInt(args[2]);
+                int z1 = Integer.parseInt(args[3]);
+                new TaskSee(x1, y1, z1).start();
+
+                break;
 
             case "strip":
                 new TaskStripMine().start();
@@ -155,10 +223,6 @@ class CommandProcessor {
 
             case "afk":
                 Main.self.sendChat("/afk");
-                break;
-
-            case "skulls":
-                new TaskWitherSkulls().start();
                 break;
 
             case "bfspyr":
@@ -199,8 +263,8 @@ class CommandProcessor {
                 }
                 if (args.length == 2) {
                     switch (args[1]) {
-                        case "-v":          
-                            craftkelpblocks = new TaskCraftKelpBlocks( true);
+                        case "-v":
+                            craftkelpblocks = new TaskCraftKelpBlocks(true);
                             craftkelpblocks.start();
                             break;
                     }
@@ -309,6 +373,17 @@ class CommandProcessor {
             String t;
             while ((t = br.readLine()) != null) {
                 compliments.add(t);
+            }
+            br.close();
+        } catch (IOException ex) {
+        }
+    }
+
+    private static void loadInsultsDictionary() {
+        try (BufferedReader br = new BufferedReader(new FileReader(scrambleInsultsFile))) {
+            String t;
+            while ((t = br.readLine()) != null) {
+                insults.add(t);
             }
             br.close();
         } catch (IOException ex) {

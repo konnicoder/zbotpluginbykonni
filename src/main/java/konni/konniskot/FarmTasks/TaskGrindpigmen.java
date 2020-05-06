@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package konni.konniskot;
+package konni.konniskot.FarmTasks;
 
 import java.util.ConcurrentModificationException;
+import konni.konniskot.Main;
+import konni.konniskot.Task;
 import zedly.zbot.BlockFace;
 import zedly.zbot.EntityType;
 import zedly.zbot.Location;

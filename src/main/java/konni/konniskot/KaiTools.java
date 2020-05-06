@@ -65,6 +65,65 @@ public class KaiTools {
 
         return null;
     }
+    public static boolean checkToolHealth() {
+
+        ItemStack is = Main.self.getInventory().getItemInHand();
+        if (is.getNbt() instanceof NBTTagCompound) {
+            NBTTagCompound nbt = (NBTTagCompound) is.getNbt();
+            int damage = nbt.getInteger("Damage");
+            System.out.println("tooldamage:" + damage);
+
+            if (damage < 1400) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static Location ScanAboveFloor(Material searchmat, int x, int y, int z, int yscanrange, int searchrange) {
+
+        int ScanAnker1X = x + 1;
+        int ScanAnker1Y = y + yscanrange;
+        int ScanAnker1Z = z - 1;
+
+        int ScanAnker2X = x - 1;
+        int ScanAnker2Y = y;
+        int ScanAnker2Z = z + 1;
+
+        int durchsuchte_bloecke = 0;
+        for (int shelllevel = 1; shelllevel <= searchrange; shelllevel++) {
+
+            for (int X = ScanAnker1X; X >= ScanAnker2X; X--) {
+                for (int Z = ScanAnker1Z; Z <= ScanAnker2Z; Z++) {
+                    for (int Y = ScanAnker1Y; Y >= ScanAnker2Y; Y--) {
+                        durchsuchte_bloecke++;
+                        if (Main.self.getEnvironment().getBlockAt(X, Y, Z).getType() == Material.BEACON) {
+                            break;
+                        }
+                        if (Main.self.getEnvironment().getBlockAt(X, Y, Z).getType() == searchmat) {
+                            return new Location(X, Y, Z);
+                        }
+
+                    }
+                }
+            }
+            ScanAnker1X++;
+            ScanAnker1Z--;
+
+            ScanAnker2X--;
+            ScanAnker2Z++;
+        }
+       // System.out.println("shell zuende");
+        //System.out.println("blöcke durchsucht: " + durchsuchte_bloecke);
+
+        return null;
+    }
+    public static int getDayTime() {
+        long time = Main.self.getEnvironment().getTimeOfDay() % 24000;
+        int daytime = (int) time;
+        System.out.println(daytime);
+        return daytime;
+    }
 
     public static Block RayCast(Location origin, Vector aim, double radius, Predicate<Block> searchmethod) {
         double x = origin.getX();
@@ -149,6 +208,10 @@ public class KaiTools {
             System.out.println(x + " " + y + " " + z);
         }
         return null;
+    }
+
+    public static void messageMaster(String master, String message) {
+        Main.self.sendChat("/msg " + master + " " + message);
     }
 
     public static boolean isVisible(Block block) {
@@ -310,10 +373,11 @@ public class KaiTools {
         for (int yachse = y1; yachse > y2; yachse--) {
             for (int xachse = x1; xachse > x2; xachse--) {
                 for (int zachse = z1; zachse < z2; zachse++) {
-                    if (Main.self.getEnvironment().getBlockAt(x2, y2, z2).getType() == searchmat) {
+                    if (Main.self.getEnvironment().getBlockAt(xachse, yachse, zachse).getType() == searchmat) {
 
                         return new Location(xachse, yachse, zachse);
                     }
+                    durchsuchte_bloecke++;
                 }
             }
         }
@@ -473,22 +537,22 @@ public class KaiTools {
 
     public static boolean lookInDoubleChestAndMove(Material mat, int targetslot, BlockingAI ai) throws InterruptedException {
         int goalslot = targetslot + 45;
-        for (int slot = 0; slot < 53; slot++) {
+        for (int slot = 0; slot < 54; slot++) {
             if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat) {
-                ai.transferItem(slot,goalslot);
+                ai.withdrawSlot(slot);
                 ai.tick();
                 return true;
             }
         }
         return false;
     }
-    
-     public static boolean checkToolFullHealth() {
+
+    public static boolean checkToolFullHealth() {
         ItemStack is = Main.self.getInventory().getItemInHand();
         if (is.getNbt() instanceof NBTTagCompound) {
             NBTTagCompound nbt = (NBTTagCompound) is.getNbt();
             int damage = nbt.getInteger("Damage");
-            
+
             if (damage < 10) {
                 return true;
             }
@@ -497,10 +561,15 @@ public class KaiTools {
     }
 
     public static void CraftFullBlockSuper(String recipeId, Material matvor, Tesseract tessvor, Tesseract tessdone, Location craft, BlockingAI ai) throws InterruptedException {
+        int debug =0;
+        fillTesseract(tessvor.getLocation());
         ai.openContainer(craft);
         Main.self.recipeBookStatus(true, false, true, false, true, false, true, false);
-        while (tessvor.getAmount() > 9 * 64) {
-            int slotsToGet = 11 - InventoryUtil.countFullStacks(matvor, 9, 44);
+        while (true) {
+            if (debug ==30){
+                fillTesseract(tessvor.getLocation());
+            }
+            int slotsToGet = 11 - InventoryUtil.countFullStacks(matvor, 10, 45);
             for (int i = 0; i < slotsToGet; i++) {
                 Main.self.clickBlock(tessvor.getLocation());
             }
@@ -511,6 +580,7 @@ public class KaiTools {
             Main.self.getInventory().click(0, 1, 0);
             fillTesseract(tessdone.getLocation());
             ai.tick();
+            debug++;
         }
     }
 

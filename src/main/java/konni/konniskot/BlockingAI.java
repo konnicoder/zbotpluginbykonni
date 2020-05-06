@@ -15,11 +15,17 @@ import java.util.function.Predicate;
 import zedly.zbot.event.Event;
 import zedly.zbot.Location;
 import zedly.zbot.BlockFace;
+import zedly.zbot.EntityType;
+import zedly.zbot.Material;
+import zedly.zbot.PotionEffect;
+import zedly.zbot.entity.Entity;
 import zedly.zbot.event.EventHandler;
 import zedly.zbot.event.Listener;
 import zedly.zbot.event.SlotUpdateEvent;
 import zedly.zbot.event.TransactionResponseEvent;
 import zedly.zbot.event.WindowOpenFinishEvent;
+import zedly.zbot.inventory.Enchantment;
+import zedly.zbot.inventory.ItemStack;
 import zedly.zbot.util.Vector;
 
 /**
@@ -32,6 +38,7 @@ public class BlockingAI implements Runnable {
     private final Object lock = "";
     private final Object timestopLock = "kek";
     private boolean timeStop = false;
+    boolean halt;
 
     public void run() {
         synchronized (lock) {
@@ -61,6 +68,51 @@ public class BlockingAI implements Runnable {
             nodes = path.getLocations();
         }
         followPath(nodes);
+        return true;
+    }
+
+    public boolean mineBlock(Location loc) throws InterruptedException {
+        ItemStack item = Main.self.getInventory().getItemInHand();
+        if (item == null) {
+            Main.self.sendChat("beschwerdich");
+            return false;
+        }
+        int efficiencyLevel = item.getEnchantments().getOrDefault(Enchantment.EFFICIENCY, 0);
+        //int efficiencyLevel = 5;
+        int efficiency = (efficiencyLevel * efficiencyLevel) + 1;
+        int hastelevel = Main.self.getPotionEffects().getOrDefault(PotionEffect.HASTE, 0);
+        int picktype = 0;
+        if (item.getType() == Material.DIAMOND_PICKAXE
+                || item.getType() == Material.DIAMOND_AXE
+                || item.getType() == Material.DIAMOND_SHOVEL) {
+            picktype = 8;
+        }
+        double hardness = Main.self.getEnvironment().getBlockAt(loc).getType().getHardness();
+        int breakspeed = (picktype + (efficiency)) * (1 + (20 * hastelevel) / 100);
+        int ticks = (int) (((hardness * 1.5) * 1000)) / breakspeed;
+        if (breakspeed >= hardness * 30) {
+            breakBlock(loc);
+            return true;
+        } else {
+            breakBlock(loc, ticks);
+            return true;
+        }
+    }
+
+    public boolean moveToDynamic(Location target, int speed) throws InterruptedException {
+        List<Location> nodes;
+        Location oldLoc = Main.self.getLocation();
+        if (oldLoc.distanceTo(target) <= 1) {
+            nodes = new LinkedList<>();
+            nodes.add(target);
+        } else {
+            GeometricPath path = AStar.getPath(target);
+            if (path == null) {
+                return false;
+            }
+            nodes = path.getLocations();
+        }
+        followPathDynamic(nodes, speed);
         return true;
     }
 
@@ -104,6 +156,75 @@ public class BlockingAI implements Runnable {
             tick();
             oldLoc = loc;
         }
+    }
+
+    public void followPathSpeedometer(List<Location> nodes, int tickdelay) throws InterruptedException {
+        Location oldLoc = Main.self.getLocation();
+        double yaw = oldLoc.getYaw();
+        for (Location loc : nodes) {
+            Vector direction = Main.self.getLocation().vectorTo(loc);
+            if (direction.getHorizontalLength() != 0) {
+                yaw = direction.getYaw();
+            }
+            int steps = (int) Math.floor(direction.getLength() / stepResolution);
+            direction = direction.normalize();
+            for (int i = 0; i < steps; i++) {
+                Main.self.moveTo(oldLoc.getRelative(direction.multiply(i * stepResolution)).withYawPitch(180 / Math.PI * yaw, oldLoc.getPitchTo(loc)));
+                tick();
+            }
+            Main.self.moveTo(loc.withYawPitch(180 / Math.PI * yaw, oldLoc.getPitchTo(loc)));
+            tick(tickdelay);
+            oldLoc = loc;
+        }
+    }
+
+    public void followPathDynamic(List<Location> nodes, int tickdelay) throws InterruptedException {
+        halt = false;
+        Location oldLoc = Main.self.getLocation();
+        double yaw = oldLoc.getYaw();
+        for (Location loc : nodes) {
+            Vector direction = Main.self.getLocation().vectorTo(loc);
+            if (direction.getHorizontalLength() != 0) {
+                yaw = direction.getYaw();
+            }
+            int steps = (int) Math.floor(direction.getLength() / 0.1);
+            direction = direction.normalize();
+            for (int i = 0; i < steps; i++) {
+                Main.self.moveTo(oldLoc.getRelative(direction.multiply(i * 0.1)).withYawPitch(180 / Math.PI * yaw, oldLoc.getPitchTo(loc)));
+                tick(tickdelay);
+                if (getPlayerLoc() != nodes) {
+                    System.out.println("HAAAALT");
+                    halt = true;
+                    break;
+                }
+            }
+            Main.self.moveTo(loc.withYawPitch(180 / Math.PI * yaw, oldLoc.getPitchTo(loc)));
+            tick(tickdelay);
+            oldLoc = loc;
+            if (halt == true) {
+                break;
+            }
+        }
+    }
+
+    private Location getPlayerLoc() {
+        for (Entity ent : Main.self.getEnvironment().getEntities()) {
+            if (ent.getType() != EntityType.PLAYER) {
+                continue;
+            }
+            if (ent.getType() == EntityType.PLAYER) {
+                Location target = ent.getLocation();
+                return target;
+            }
+
+        }
+
+        return null;
+    }
+
+    public void stopWalk() {
+
+        halt = true;
     }
 
     public void breakBlock(Location loc, int millis) throws InterruptedException {
@@ -155,8 +276,8 @@ public class BlockingAI implements Runnable {
 
     public <T extends Event> T waitForEvent(final Class<T> eventClass, Predicate<T> eventFilter, int timeoutMillis) throws InterruptedException {
         long startTime = System.currentTimeMillis();
-        final Event [] event = new Event [1];
-              
+        final Event[] event = new Event[1];
+
         final BlockingAI ai = this;
         final AtomicBoolean detected = new AtomicBoolean();
         detected.set(false);
@@ -166,7 +287,7 @@ public class BlockingAI implements Runnable {
             public void listen(T hue) {
                 if (eventClass.isInstance(hue) && eventFilter.test(hue)) {
                     detected.set(true);
-                    event [0] = hue;
+                    event[0] = hue;
                     Main.self.unregisterEvents(this);
                     synchronized (lock) {
                         lock.notifyAll();
@@ -189,10 +310,10 @@ public class BlockingAI implements Runnable {
 
     public boolean openContainer(int x, int y, int z) throws InterruptedException {
         Main.self.placeBlock(x, y, z, BlockFace.NORTH);
-        if (waitForEvent(WindowOpenFinishEvent.class, 5000)==null) {
+        if (waitForEvent(WindowOpenFinishEvent.class, 5000) == null) {
             return false;
         }
-        while (waitForEvent(SlotUpdateEvent.class, 250)!=null) {
+        while (waitForEvent(SlotUpdateEvent.class, 250) != null) {
         }
         return true;
     }
@@ -205,7 +326,7 @@ public class BlockingAI implements Runnable {
         //final int expectedSlot = Main.self.getInventory().getSelectedSlot() + 9;
         Main.self.closeWindow();
         if (Main.self.getInventory().changed()) {
-            boolean closed = waitForEvent(SlotUpdateEvent.class, 5000)!=null;
+            boolean closed = waitForEvent(SlotUpdateEvent.class, 5000) != null;
             return closed;
         }
         tick();
@@ -227,8 +348,8 @@ public class BlockingAI implements Runnable {
         }
         return transferItem(sourceSlot, destSlot);
     }
-    
-     public int swapItems(int sourceSlot, int destSlot) throws InterruptedException {
+
+    public int swapItems(int sourceSlot, int destSlot) throws InterruptedException {
         if (!clickSlot(sourceSlot, 0, 0)) {
             return 1;
         }

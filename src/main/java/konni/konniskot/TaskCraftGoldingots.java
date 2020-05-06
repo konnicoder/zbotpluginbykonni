@@ -6,6 +6,8 @@
 package konni.konniskot;
 
 import java.util.ConcurrentModificationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import zedly.zbot.BlockFace;
 import zedly.zbot.EntityType;
 import zedly.zbot.Location;
@@ -37,12 +39,14 @@ public class TaskCraftGoldingots extends Task {
 
     public void run() {
 
-        int nuggetsinpipeline = (int) (nuggetTesseract1.getAmount() + nuggetTesseract2.getAmount() + nuggetTesseract3.getAmount() + nuggetTesseractsmelter.getAmount());
-        int ingotsinpipeline = (int) ingotTesseractdropper.getAmount();
-        System.out.println("Nuggets in pipeline: " + nuggetsinpipeline + " = " + nuggetsinpipeline / 64 + " Stacks");
-        System.out.println("Ingots in pipeline: " + ingotsinpipeline + " = " + ingotsinpipeline / 64 + " Stacks");
-        int totalnuggetsinpipeline = nuggetsinpipeline + ingotsinpipeline * 9;
-        System.out.println("Total Nuggets in Pipeline: "+totalnuggetsinpipeline+" = "+totalnuggetsinpipeline / 64 + " Stacks");
+        try {
+            KaiTools.CraftFullBlockSuper("gold_ingot_from_nuggets", Material.GOLD_NUGGET, nuggetTesseract1, ingotTesseractfinal, craftingbench, ai);
+//           while(true){
+//            KaiTools.CraftFullBlockSpeed(Material.GOLD_NUGGET, nuggetTesseract1.getLocation(), ingotTesseractfinal.getLocation(), craftingbench, ai);
+//           }
+        } catch (InterruptedException ex) {
+        
+        }
     
 
     

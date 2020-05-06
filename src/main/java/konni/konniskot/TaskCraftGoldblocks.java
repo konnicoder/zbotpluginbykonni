@@ -5,6 +5,9 @@
  */
 package konni.konniskot;
 
+import konni.konniskot.KaiTools;
+import konni.konniskot.Task;
+import konni.konniskot.Tesseract;
 import zedly.zbot.BlockFace;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
@@ -34,7 +37,7 @@ public class TaskCraftGoldblocks extends Task {
 
             KaiTools.CraftFullBlockSuper("gold_block", Material.GOLD_INGOT, ingotTesseract, goldblockTesseract, craftingbench, ai);
 
-        } catch (InterruptedException siglinde) {
+        } catch (InterruptedException guenther) {
         }
     }
 

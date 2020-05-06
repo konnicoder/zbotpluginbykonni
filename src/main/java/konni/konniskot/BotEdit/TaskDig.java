@@ -90,15 +90,15 @@ public class TaskDig extends Task {
         Location walk = new Location(x, Y, z).centerHorizontally();
         Location laseraim = new Location(x, Y + 3, z);
         for (int r = 0; r < sliceheight; r++) {
-            Material mat = Main.self.getEnvironment().getBlockAt(x, Y + 2 + r, z).getType();
-            if (mat == Material.AIR || mat == Material.CAVE_AIR || mat == Material.VOID_AIR) {
-                continue;
-            }
+           // Material mat = Main.self.getEnvironment().getBlockAt(x, Y + 2 + r, z).getType();
+            //if (mat == Material.AIR || mat == Material.CAVE_AIR || mat == Material.VOID_AIR) {
+             //   continue;
+           // }
             if (Main.self.getLocation().distanceTo(walk) > 0.1) {
                 ai.moveTo(walk);
             }
             Main.self.lookAt(0, -89);
-            ai.tick();
+            ai.tick(2);
             Main.self.placeBlock(laseraim, BlockFace.EAST);
         }
     }

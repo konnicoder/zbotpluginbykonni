@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package konni.konniskot;
+package konni.konniskot.FarmTasks;
 
+import konni.konniskot.Main;
+import konni.konniskot.Task;
 import net.minecraft.server.NBTTagCompound;
 import zedly.zbot.inventory.ItemStack;
 

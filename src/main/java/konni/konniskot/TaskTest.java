@@ -20,21 +20,20 @@ import zedly.zbot.entity.Entity;
  * @author Konstantin
  */
 public class TaskTest extends Task {
- 
-   
-   
-    public TaskTest() {
-        super(100);
 
+    Location loc;
+
+    public TaskTest(int x, int y, int z) {
+        super(100);
+        loc = new Location(x, y, z);
     }
 
     public void run() {
 
         try {
-          ai.tick();
-          
-          
-          
+            ai.tick();
+            ai.mineBlock(loc);
+
         } catch (InterruptedException ex) {
 
         }
