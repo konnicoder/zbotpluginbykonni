@@ -5,6 +5,9 @@
  */
 package konni.konniskot;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.logging.Level;
@@ -14,6 +17,7 @@ import zedly.zbot.EntityType;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
 import zedly.zbot.entity.Entity;
+import konni.konniskot.Main;
 
 /**
  *
@@ -21,23 +25,29 @@ import zedly.zbot.entity.Entity;
  */
 public class TaskTest extends Task {
 
-    Location loc;
+    private static final File test = new File(Main.instance.getDataFolder(), "test.txt");
 
-    public TaskTest(int x, int y, int z) {
+    public TaskTest() {
         super(100);
-        loc = new Location(x, y, z);
+
     }
 
     public void run() {
-
-        try {
-            ai.tick();
-            ai.mineBlock(loc);
-
-        } catch (InterruptedException ex) {
-
-        }
+        Main.self.sendChat("Doing a test!");
+        writetofile();
 
     }
 
+    private void writetofile() {
+        String s = "hallo";
+        try {
+            FileOutputStream fos = new FileOutputStream(test);
+
+            fos.write(s.getBytes());
+            fos.write("\r\n".getBytes());
+
+            fos.close();
+        } catch (IOException ex) {
+        }
+    }
 }

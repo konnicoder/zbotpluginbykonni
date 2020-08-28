@@ -21,6 +21,7 @@ import zedly.zbot.PotionEffect;
 import zedly.zbot.entity.Entity;
 import zedly.zbot.event.EventHandler;
 import zedly.zbot.event.Listener;
+import zedly.zbot.event.PlayerFinishEatingEvent;
 import zedly.zbot.event.SlotUpdateEvent;
 import zedly.zbot.event.TransactionResponseEvent;
 import zedly.zbot.event.WindowOpenFinishEvent;
@@ -70,6 +71,15 @@ public class BlockingAI implements Runnable {
         followPath(nodes);
         return true;
     }
+    
+   
+
+    public void eat(int usedHand) throws InterruptedException {
+        Main.self.eatHeldItem(usedHand);
+        waitForEvent(PlayerFinishEatingEvent.class, (e) -> {
+            return e.getPlayer() ==Main.self;
+        }, 10000);
+    }
 
     public boolean mineBlock(Location loc) throws InterruptedException {
         ItemStack item = Main.self.getInventory().getItemInHand();
@@ -91,7 +101,7 @@ public class BlockingAI implements Runnable {
         int breakspeed = (picktype + (efficiency)) * (1 + (20 * hastelevel) / 100);
         int ticks = (int) (((hardness * 1.5) * 1000)) / breakspeed;
         if (breakspeed >= hardness * 30) {
-            breakBlock(loc);
+            breakBlock(loc,1);
             return true;
         } else {
             breakBlock(loc, ticks);

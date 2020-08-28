@@ -40,7 +40,7 @@ public class TaskCraftGoldingots extends Task {
     public void run() {
 
         try {
-            KaiTools.CraftFullBlockSuper("gold_ingot_from_nuggets", Material.GOLD_NUGGET, nuggetTesseract1, ingotTesseractfinal, craftingbench, ai);
+            KaiTools.CraftFullBlockSuper("gold_ingot_from_nuggets", Material.GOLD_NUGGET, nuggetTesseract3, ingotTesseractfinal, craftingbench, ai);
 //           while(true){
 //            KaiTools.CraftFullBlockSpeed(Material.GOLD_NUGGET, nuggetTesseract1.getLocation(), ingotTesseractfinal.getLocation(), craftingbench, ai);
 //           }

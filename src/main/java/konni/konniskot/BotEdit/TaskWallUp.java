@@ -29,7 +29,7 @@ public class TaskWallUp extends Task {
     int targetyheight;
     int debug = 0;
     String operator;
-    Material wallmat = Material.STONE;
+    Material wallmat = Material.OBSIDIAN;
 
     public TaskWallUp(int yheight, String user) {
         super(30);
@@ -89,6 +89,19 @@ public class TaskWallUp extends Task {
         if (getLocationAndPlace(Main.self.getLocation().getRelative(0, 0, -1).centerHorizontally()) == true) {
             return true;
         }
+        //ab hier experiment
+        if (getLocationAndPlace(Main.self.getLocation().getRelative(+1, 0, +1).centerHorizontally()) == true) {
+            return true;
+        }
+        if (getLocationAndPlace(Main.self.getLocation().getRelative(+1, 0, -1).centerHorizontally()) == true) {
+            return true;
+        }
+        if (getLocationAndPlace(Main.self.getLocation().getRelative(-1, 0, +1).centerHorizontally()) == true) {
+            return true;
+        }
+        if (getLocationAndPlace(Main.self.getLocation().getRelative(-1, 0, -1).centerHorizontally()) == true) {
+            return true;
+        }
 
         return false;
     }
@@ -121,7 +134,6 @@ public class TaskWallUp extends Task {
         BlockChangeEvent be = ai.waitForEvent(BlockChangeEvent.class, 1500);
 
         //System.out.println(be);
-        
         while (Main.self.getEnvironment().getBlockAt(loc).getType() == Material.AIR) {
             ai.tick(5);
             if (Main.self.getEnvironment().getBlockAt(loc).getType() == wallmat) {
@@ -140,7 +152,7 @@ public class TaskWallUp extends Task {
                 debug = 0;
                 KaiTools.messageMaster(operator, "debugged placement");
                 System.out.println(debug);
-                getResources();
+                //getResources();
             }
         }
         debug = 0;
@@ -149,7 +161,7 @@ public class TaskWallUp extends Task {
     }
 
     public void testIfItemAvaliable() throws InterruptedException {
-        if (InventoryUtil.count(Material.STONE, true, false) <= 70) {
+        if (InventoryUtil.count(wallmat, true, false) <= 70) {
             ai.tick(20);
             KaiTools.messageMaster(operator, "getting materials");
             System.out.println("getting materials placeblock");
@@ -157,10 +169,10 @@ public class TaskWallUp extends Task {
             getResources();
             ai.tick(10);
         }
-        while (KaiTools.testStackAvaliable(Material.STONE, 36) == false) {
-            if (KaiTools.lookInInventoryAndMove(Material.STONE, 36, ai) == false) {
+        while (KaiTools.testStackAvaliable(wallmat, 36) == false) {
+            if (KaiTools.lookInInventoryAndMove(wallmat, 36, ai) == false) {
                 System.out.println("cant find items");
-                System.out.println(InventoryUtil.count(Material.STONE, true, false));
+                System.out.println(InventoryUtil.count(wallmat, true, false));
             }
         }
 
@@ -170,7 +182,7 @@ public class TaskWallUp extends Task {
         if (Main.self.getLocation().getY() == targetyheight) {
             return false;
         }
-        if (InventoryUtil.count(Material.STONE, true, false) <= 3) {
+        if (InventoryUtil.count(wallmat, true, false) <= 3) {
             getResources();
             ai.tick();
         }
@@ -185,21 +197,22 @@ public class TaskWallUp extends Task {
 
     public void getResources() throws InterruptedException {
         System.out.println("getResources");
-        Main.self.sendChat("/sethome temp");
-        ai.tick(5);
-        Main.self.sendChat("/home res");
-        ai.tick(40);
-        if (Main.self.getLocation().distanceTo(RES_WALK_LOC) > 0.1) {
-            ai.moveTo(RES_WALK_LOC);
-            ai.tick(5);
-        }
-        while (InventoryUtil.countFreeStorageSlots(true, false) >= 1) {
-            Main.self.clickBlock(STONE_TESS_LOC);
-            ai.tick(10);
-        }
-        ai.tick(10);
-        Main.self.sendChat("/home temp");
-        ai.tick(40);
+        error = 5;
+//        Main.self.sendChat("/sethome temp");
+//        ai.tick(5);
+//        Main.self.sendChat("/home res");
+//        ai.tick(40);
+//        if (Main.self.getLocation().distanceTo(RES_WALK_LOC) > 0.1) {
+//            ai.moveTo(RES_WALK_LOC);
+//            ai.tick(5);
+//        }
+//        while (InventoryUtil.countFreeStorageSlots(true, false) >= 1) {
+//            Main.self.clickBlock(STONE_TESS_LOC);
+//            ai.tick(10);
+//        }
+//        ai.tick(10);
+//        Main.self.sendChat("/home temp");
+//        ai.tick(40);
 
     }
 }

@@ -25,6 +25,7 @@ public class Main extends ZBotPlugin {
     public static Main instance;
     public static Self self;
     public static Random rnd = new Random();
+    
 
     @Override
     public void onEnable(Self self) {

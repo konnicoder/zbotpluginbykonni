@@ -24,9 +24,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import konni.konniskot.BotEdit.TaskDigLegit;
+import konni.konniskot.BotEdit.TaskFillFloor;
 import konni.konniskot.BotEdit.TaskPyramid;
 import konni.konniskot.BotEdit.TaskPyramidBFS;
 import konni.konniskot.BotEdit.TaskWallUp;
+import konni.konniskot.FarmTasks.TaskFarmPigmen;
+import konni.konniskot.FarmTasks.TaskFarmShulkerShells;
+import konni.konniskot.FarmTasks.TaskFarmWitherSkelletons;
+import konni.konniskot.FarmTasks.TaskMineEndPillars;
+import konni.konniskot.FarmTasks.TaskMineOres;
 import zedly.zbot.BlockFace;
 
 /**
@@ -36,8 +43,6 @@ import zedly.zbot.BlockFace;
 class CommandProcessor {
 
     private static TaskCraftGoldingots goldingotcraft;
-
-    private static TaskCraftKelpBlocks craftkelpblocks;
     private static TaskGrindpigmen pigmentask;
     private static final File scrambleComplimentFile = new File(Main.instance.getDataFolder(), "compliments.txt");
     private static final File scrambleInsultsFile = new File(Main.instance.getDataFolder(), "insults.txt");
@@ -52,6 +57,9 @@ class CommandProcessor {
         loadInsultsDictionary();
 
         switch (args[0]) {
+            case "tps":
+                new TaskAFK().start();
+                break;
 
             case "time":
                 int time = KaiTools.getDayTime();
@@ -62,6 +70,14 @@ class CommandProcessor {
                     Main.self.sendChat("nope.");
                 }
 
+                break;
+
+            case "on":
+                Main.self.sendChat("/home dj");
+                break;
+
+            case "off":
+                Main.self.sendChat("/spawn");
                 break;
 
             case "hallo":
@@ -91,10 +107,23 @@ class CommandProcessor {
 
         }
         switch (args[0]) {
+            case "ore":
+                new TaskMineOres().start();
+                break;
+            case "pups":
+                int mm = Integer.parseInt(args[1]);
+                new TaskFarmPigmen(mm).start();
+                break;
+            case "health":
+                Main.self.sendChat("" + Main.self.getHealth());
+                break;
+            case "shulker":
+                new TaskFarmShulkerShells(user).start();
+                break;
             case "st":
-                if (args.length == 2){
+                if (args.length == 2) {
                     int dis = Integer.parseInt(args[1]);
-                new TaskStripMineReal(dis).start();
+                    new TaskStripMineReal(dis).start();
                 }
                 break;
             case "carrot":
@@ -112,20 +141,21 @@ class CommandProcessor {
                 new TaskGuardianGrinder().start();
                 break;
 
-            case "mine":
-                if (args.length == 1) {
-                    Main.self.sendChat("(prefix) mine (x) (y) (z)");
-                }
-                if (args.length == 4) {
-                    int x = Integer.parseInt(args[1]);
-                    int y = Integer.parseInt(args[2]);
-                    int z = Integer.parseInt(args[3]);
-                    new TaskTest(x, y, z).start();
-                }
+            case "Test":
+                new TaskTest().start();
+
                 break;
 
-            case "craftsl":
-                new TaskCraftSeaLanterns().start();
+            case "obs":
+                new TaskMineEndPillars(user).start();
+                break;
+
+            case "fl":
+                new TaskFillFloor().start();
+                break;
+
+            case "farm_W":
+                new TaskFarmWitherSkelletons().start();
                 break;
 
             case "pfloor":
@@ -160,7 +190,7 @@ class CommandProcessor {
                 }
 
                 break;
-            case "m":
+            case "MR":
                 if (args.length == 2) {
                     int mode = Integer.parseInt(args[1]);
                     new TaskMazeRunner(mode).start();
@@ -193,6 +223,24 @@ class CommandProcessor {
                     int sh = Integer.parseInt(args[7]);
                     int sk = Integer.parseInt(args[8]);
                     new TaskDig(x1, y1, z1, x2, y2, z2, sh, sk).start();
+                }
+
+                break;
+
+            case "di":
+                if (args.length == 1) {
+                    Main.self.sendChat("prefix d x1 y1 z1 x2 y2 z2 targetheight");
+                }
+                if (args.length == 8) {
+                    int x1 = Integer.parseInt(args[1]);
+                    int y1 = Integer.parseInt(args[2]);
+                    int z1 = Integer.parseInt(args[3]);
+                    int x2 = Integer.parseInt(args[4]);
+                    int y2 = Integer.parseInt(args[5]);
+                    int z2 = Integer.parseInt(args[6]);
+                    int th = Integer.parseInt(args[7]);
+
+                    new TaskDigLegit(x1, y1, z1, x2, y2, z2, th).start();
                 }
 
                 break;
@@ -245,30 +293,8 @@ class CommandProcessor {
                 }
                 break;
 
-            case "get":
-                if (args.length == 2) {
-
-                    taskgetsand = new TaskGetSand();
-                    taskgetsand.start();
-                }
-                break;
-
-            case "stop":
-                taskgetsand.cancel();
-                break;
-
-            case "kelp":
-                if (args.length == 1) {
-                    Main.self.sendChat("(prefix) kelp (verbose)");
-                }
-                if (args.length == 2) {
-                    switch (args[1]) {
-                        case "-v":
-                            craftkelpblocks = new TaskCraftKelpBlocks(true);
-                            craftkelpblocks.start();
-                            break;
-                    }
-                }
+            case "sand":
+                new TaskGetSand().start();
                 break;
 
             case "trash":
@@ -277,10 +303,6 @@ class CommandProcessor {
 
             case "xp":
                 Main.self.sendChat("/home xp");
-                break;
-
-            case "test":
-                new TaskFixfarm().start();
                 break;
 
             case "grind":
@@ -304,25 +326,6 @@ class CommandProcessor {
                     System.out.println("stopped TaskGrindpigmen");
                 } else {
                     System.out.println("Task läuft nicht");
-                }
-                break;
-
-            case "midas":
-                if (args.length == 1) {
-                    Main.self.sendChat("grind, craft_gold, craft_goldblocks");
-                }
-                if (args.length == 2) {
-                    switch (args[1]) {
-                        case "grind":
-                            new TaskMidas(1).start();
-                            break;
-                        case "craft_gold":
-                            new TaskMidas(2).start();
-                            break;
-                        case "craft_goldblocks":
-                            new TaskMidas(3).start();
-                            break;
-                    }
                 }
                 break;
 

@@ -136,7 +136,7 @@ public class TaskGrindpigmen extends Task {
             Entity nearestAnnoying = null;
             for (Entity ent : Main.self.getEnvironment().getEntities()) {
                 if (ent.getType() != EntityType.CHICKEN
-                        && ent.getType() != EntityType.PIG_ZOMBIE) {
+                        && ent.getType() != EntityType.ZOMBIE_PIGMAN) {
                     continue;
                 }
                 if (ent.getLocation().distanceTo(attackLoc) < 4) {

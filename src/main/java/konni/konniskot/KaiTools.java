@@ -8,6 +8,8 @@ package konni.konniskot;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.server.NBTTagCompound;
 import zedly.zbot.BlockFace;
 import zedly.zbot.ConcurrentLinkedQueue;
@@ -26,6 +28,9 @@ import zedly.zbot.util.Vector;
  * @author Konstantin
  */
 public class KaiTools {
+
+
+
 
     public static Location Scan(Material searchmat, int x, int y, int z, int yscanrange, int searchrange) {
 
@@ -60,8 +65,8 @@ public class KaiTools {
             ScanAnker2X--;
             ScanAnker2Z++;
         }
-        System.out.println("shell zuende");
-        System.out.println("blöcke durchsucht: " + durchsuchte_bloecke);
+        //System.out.println("shell zuende");
+        //System.out.println("blöcke durchsucht: " + durchsuchte_bloecke);
 
         return null;
     }
@@ -71,7 +76,7 @@ public class KaiTools {
         if (is.getNbt() instanceof NBTTagCompound) {
             NBTTagCompound nbt = (NBTTagCompound) is.getNbt();
             int damage = nbt.getInteger("Damage");
-            System.out.println("tooldamage:" + damage);
+            //System.out.println("tooldamage:" + damage);
 
             if (damage < 1400) {
                 return true;
@@ -121,7 +126,7 @@ public class KaiTools {
     public static int getDayTime() {
         long time = Main.self.getEnvironment().getTimeOfDay() % 24000;
         int daytime = (int) time;
-        System.out.println(daytime);
+        //System.out.println(daytime);
         return daytime;
     }
 
@@ -566,9 +571,10 @@ public class KaiTools {
         ai.openContainer(craft);
         Main.self.recipeBookStatus(true, false, true, false, true, false, true, false);
         while (true) {
-            if (debug ==30){
-                fillTesseract(tessvor.getLocation());
-            }
+            fillTesseract(tessvor.getLocation());
+//            if (debug ==30){
+//                fillTesseract(tessvor.getLocation());
+//            }
             int slotsToGet = 11 - InventoryUtil.countFullStacks(matvor, 10, 45);
             for (int i = 0; i < slotsToGet; i++) {
                 Main.self.clickBlock(tessvor.getLocation());
@@ -576,7 +582,7 @@ public class KaiTools {
             Main.self.requestRecipe(recipeId, true);
             ai.waitForEvent(SlotUpdateEvent.class, (e) -> {
                 return e.getSlotId() == 0;
-            }, 5000);
+            }, 1000);
             Main.self.getInventory().click(0, 1, 0);
             fillTesseract(tessdone.getLocation());
             ai.tick();

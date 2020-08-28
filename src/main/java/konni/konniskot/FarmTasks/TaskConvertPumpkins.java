@@ -21,6 +21,8 @@ public class TaskConvertPumpkins extends Task {
     private static final Location MINING_LOC = new Location(316, 138, -8718).centerHorizontally();
     private static final Location CHEST_LOC = new Location(315, 137, -8716).centerHorizontally();
     private static final Location PUMPKIN_TESS_LOC = new Location(296, 125, -8720).centerHorizontally();
+    private static final Location SEEDS_CHEST_LOC = new Location(317, 140, -8717).centerHorizontally();
+    
     private static final HashSet<Material> products = new HashSet<>();
     public int shearsslot = 2;
     public int axeslot = 3;
@@ -43,7 +45,7 @@ public class TaskConvertPumpkins extends Task {
 
                     ai.tick();
                     convert();
-                    System.out.println("converting");
+                    //System.out.println("converting");
                 }
 
                 ai.tick(5);
@@ -75,11 +77,21 @@ public class TaskConvertPumpkins extends Task {
         ai.openContainer(CHEST_LOC);
         for (int i = 54; i <= 89; i++) {
             if (Main.self.getInventory().getSlot(i) != null
-                    && products.contains(Main.self.getInventory().getSlot(i).getType())) {
+                    && Main.self.getInventory().getSlot(i).getType() == Material.CARVED_PUMPKIN) {
                 ai.depositSlot(i);
             }
         }
         ai.closeContainer();
+        ai.tick();
+        ai.openContainer(SEEDS_CHEST_LOC);
+        for (int i = 54; i <= 89; i++) {
+            if (Main.self.getInventory().getSlot(i) != null
+                    && Main.self.getInventory().getSlot(i).getType() == Material.PUMPKIN_SEEDS) {
+                ai.depositSlot(i);
+            }
+        }
+        ai.closeContainer();
+        
     }
 
     public void getItems() throws InterruptedException {

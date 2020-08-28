@@ -238,7 +238,7 @@ public class TaskGoldfarm extends Task {
             ai.moveTo(home);
             ai.tick();
             Main.self.attackEntity(skeleton);
-            ai.tick(5);
+            ai.tick(7);
             return true;
         }
         return false;
@@ -250,7 +250,7 @@ public class TaskGoldfarm extends Task {
             Entity nearestAnnoying = null;
             for (Entity ent : Main.self.getEnvironment().getEntities()) {
                 if (ent.getType() != EntityType.CHICKEN
-                        && ent.getType() != EntityType.PIG_ZOMBIE) {
+                        && ent.getType() != EntityType.ZOMBIE_PIGMAN) {
                     continue;
                 }
                 if (ent.getLocation().distanceTo(attackLoc) < 4) {

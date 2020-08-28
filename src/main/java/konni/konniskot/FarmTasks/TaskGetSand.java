@@ -5,6 +5,7 @@
  */
 package konni.konniskot.FarmTasks;
 
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import konni.konniskot.InventoryUtil;
@@ -13,8 +14,11 @@ import konni.konniskot.Main;
 import konni.konniskot.Task;
 import net.minecraft.server.NBTTagCompound;
 import zedly.zbot.BlockFace;
+import zedly.zbot.EntityType;
 import zedly.zbot.Location;
 import zedly.zbot.Material;
+import zedly.zbot.entity.Entity;
+import zedly.zbot.entity.Item;
 import zedly.zbot.inventory.ItemStack;
 
 /**
@@ -35,45 +39,56 @@ public class TaskGetSand extends Task {
     int ScanAnker2Y = 0;
     int ScanAnker2Z = 0;
     public Location aktuell = null;
-
-    private static final Location SPAWN_SANDFARM_WALK = new Location(-19, 80, -46).centerHorizontally();
-    private static final Location SPAWN_SANDFARM_SIGN = new Location(-19, 80, -47).centerHorizontally();
-    private static final Location SANDFARM_LIFTSIGN_WALK = new Location(9613, 63, 7765).centerHorizontally();
-    private static final Location SANDFARM_LIFTSIGN_1 = new Location(9612, 64, 7765).centerHorizontally();
-    private static final Location SANDFARM_LIFTSIGN_2 = new Location(9612, 85, 7766).centerHorizontally();
-    private static final Location SANDFARM_LIFTSIGN_3 = new Location(9612, 106, 7765).centerHorizontally();
-    private static final Location SANDFARM_FLOOR_6_START = new Location(9612, 144, 7761).centerHorizontally();
-
-    private static final Location SAND_TESSERACT_LOC = new Location(216, 138, -8665).centerHorizontally();
-    private static final Location SAND_TESSERACT_WALK = new Location(216, 137, -8666).centerHorizontally();
-
-    private static final Location waypoint0 = new Location(260, 137, -8711).centerHorizontally();
-    private static final Location waypoint1 = new Location(260, 137, -8711).centerHorizontally();
-    private static final Location waypoint2 = new Location(229, 137, -8711).centerHorizontally();
+    int Y;
 
     public TaskGetSand() {
         super(100);
-
     }
 
     public void run() {
+        System.out.println("TaskGetSand started");
+        Y = Main.self.getLocation().getBlockY();
+        Main.self.selectSlot(0);
         try {
-            if (Main.self.getLocation().distanceTo(SANDFARM_FLOOR_6_START) > 100) {
-                gotoSandfarm();
-            } else {
-                ai.moveTo(SANDFARM_FLOOR_6_START);
+            Location startpos = new Location(9610, Y, 7759);
+            ai.moveTo(startpos);
+            int Zachse;
+
+            for (int Xachse = 9610; Xachse > 9568; Xachse = Xachse - 5) {
+
+                for (Zachse = 7760; Zachse > 7720; Zachse--) {
+                    if (checkToolHealth() == false) {
+                        Main.self.sendChat("break because of low tool health");
+                        break;
+                    }
+
+                    aktuell = Main.self.getLocation();
+                    double X = aktuell.getX();
+                    double Z = aktuell.getZ();
+
+                    int x = (int) (X + 0.5);
+                    int z = (int) (Z + 0.5);
+
+                    if (InventoryUtil.countFreeStorageSlots(true, false) == 0) {
+                        while (InventoryUtil.countFreeStorageSlots(true, false) == 0) {
+                            emptyInventory();
+
+                        }
+                    }
+
+                    while (KaiTools.Scan(Material.SAND, x, Y, z, 3, 3) != null) {
+                        ai.breakBlock(KaiTools.Scan(Material.SAND, x, Y, z, 3, 3), 1);
+                    }
+                    while (KaiTools.Scan(Material.RED_SAND, x, Y, z, 3, 3) != null) {
+                        ai.breakBlock(KaiTools.Scan(Material.RED_SAND, x, Y, z, 3, 3), 1);
+                    }
+                    Location walk = new Location(Xachse, Y, Zachse);
+                    ai.moveTo(walk);
+                    ai.tick();
+                }
             }
-            System.out.println("get Sand");
-            ai.tick(5);
-            inSandfarm();
-            ai.tick();
-            Main.self.sendChat("Inventory full;");
-            //ai.tick();
-            //fillTesseract();
         } catch (InterruptedException ex) {
-
         }
-
     }
 
     public boolean checkToolHealth() {
@@ -82,7 +97,7 @@ public class TaskGetSand extends Task {
             NBTTagCompound nbt = (NBTTagCompound) is.getNbt();
             int damage = nbt.getInteger("Damage");
 
-            if (damage < 1400) {
+            if (damage < 1300) {
                 return true;
             }
         }
@@ -90,90 +105,46 @@ public class TaskGetSand extends Task {
         return false;
     }
 
-    public void fillTesseract() throws InterruptedException {
-        Main.self.selectSlot(0);
-        ai.tick();
-        Main.self.sendChat("/home xp");
-        ai.tick(20);
-        ai.moveTo(waypoint1);
-        ai.tick(5);
-        ai.moveTo(waypoint2);
-        ai.tick(3);
-        ai.moveTo(SAND_TESSERACT_WALK);
-        Main.self.sneak(true);
-        ai.tick();
-        Main.self.placeBlock(SAND_TESSERACT_LOC, BlockFace.EAST);
-        ai.tick();
-        Main.self.sneak(false);
-    }
+    public void emptyInventory() throws InterruptedException {
+        int ding = 0;
+        Location org = Main.self.getLocation();
 
-    public void gotoSandfarm() throws InterruptedException {
+        while (true) {
 
-        Main.self.sendChat("/spawn");
-        ai.tick(20);
-        ai.moveTo(SPAWN_SANDFARM_WALK);
-        Main.self.placeBlock(SPAWN_SANDFARM_SIGN, BlockFace.EAST);
-        ai.tick(20);
-        ai.moveTo(SANDFARM_LIFTSIGN_WALK);
-        ai.tick(10);
-        Main.self.placeBlock(SANDFARM_LIFTSIGN_1, BlockFace.EAST);
-        ai.tick(10);
-        ai.moveTo(Main.self.getLocation().getRelative(0, -1, 0));
-        ai.tick(10);
-        Main.self.placeBlock(SANDFARM_LIFTSIGN_2, BlockFace.EAST);
-        ai.tick(10);
-        ai.moveTo(Main.self.getLocation().getRelative(0, -1, 0));
-        ai.tick(10);
-        Main.self.placeBlock(SANDFARM_LIFTSIGN_3, BlockFace.EAST);
-        ai.tick(10);
-        ai.moveTo(Main.self.getLocation().getRelative(0, -1, 0));
-        ai.tick(10);
-        ai.moveTo(SANDFARM_FLOOR_6_START);
-        ai.tick(10);
-    }
+            if (KaiTools.Scan(Material.SHULKER_BOX, org.getBlockX(), org.getBlockY(), org.getBlockZ(), 2, 4) != null) {
 
-    public void inSandfarm() {
-        System.out.println("Starting farm Sand");
-        Main.self.selectSlot(2);
-        try {
-            int Zachse;
-            while (InventoryUtil.countFreeStorageSlots(true, false) > 0 && checkToolHealth()==true) {
-
-                for (int Xachse = 9610; Xachse > 9570; Xachse = Xachse - 5) {
-
-                    for (Zachse = 7759; Zachse > 7720; Zachse--) {
-
-                        aktuell = Main.self.getLocation();
-                        double X = aktuell.getX();
-                        double Y = aktuell.getY();
-                        double Z = aktuell.getZ();
-
-                        int x = (int) (X + 0.5);
-                        int y = (int) (Y + 0.5);
-                        //System.out.println(y);
-                        int z = (int) (Z + 0.5);
-                        if (InventoryUtil.countFreeStorageSlots(true, false) == 0) {
-                            break;
-                        }
-
-                        while (KaiTools.Scan(Material.SAND, x, y, z, 3, 3) != null) {
-                            ai.breakBlock(KaiTools.Scan(Material.SAND, x, y, z, 3, 3), 1);
-
-                        }
-                        while (KaiTools.Scan(Material.RED_SAND, x, y, z, 3, 3) != null) {
-                            ai.breakBlock(KaiTools.Scan(Material.RED_SAND, x, y, z, 3, 3), 1);
-
-                        }
-                        Location walk = new Location(Xachse, Y, Zachse);
-                        ai.moveTo(walk);
-                        //WALK
-                    }
-                }
+                break;
             }
-            System.out.println("Inventory full");
-
-        } catch (InterruptedException ex) {
+            ai.tick(20);
+            System.out.println("Waiting for shulkerbox");
+            if (ding == 0) {
+                Main.self.sendChat("ding Konni");
+            }
+            ding++;
         }
+
+        Location shulker = KaiTools.Scan(Material.SHULKER_BOX, org.getBlockX(), org.getBlockY(), org.getBlockZ(), 2, 4);
+        ai.openContainer(shulker);
+        for (int slot = 27; slot <= 62; slot++) {
+            if (Main.self.getInventory().getSlot(slot) != null
+                    && Main.self.getInventory().getSlot(slot).getType() == Material.SAND
+                    || Main.self.getInventory().getSlot(slot).getType() == Material.RED_SAND) {
+                ai.depositSlot(slot);
+            }
+            if (InventoryUtil.countFreeStorageSlots(false, true) == 0) {
+                break;
+            }
+
+        }
+        ai.closeContainer();
+    }
+
+    public void ups() {
+        Collection<Entity> items = Main.self.getEnvironment().getEntities();
+        items.removeIf((e) -> {
+            return !(e instanceof Item) || ((Item) e).getItemStack().getType() != Material.CHARCOAL;
+        });
+
     }
 
     public void cancel() {

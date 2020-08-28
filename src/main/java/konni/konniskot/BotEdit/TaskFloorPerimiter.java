@@ -31,7 +31,7 @@ public class TaskFloorPerimiter extends Task {
     int blockslot;
 
     public TaskFloorPerimiter(int x1, int y1, int z1, int x2, int y2, int z2) {
-        super(10);
+        super(20);
         this.x1 = x1;
         this.y1 = y1;
         this.z1 = z1;
