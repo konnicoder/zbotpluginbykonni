@@ -137,11 +137,11 @@ public class TaskConcrete extends Task {
         ai.tick();
         ai.openContainer(POWDER_CHEST_LOC);
         // if no suitable powder is in chest, returns false
-
-        if (KaiTools.lookInDoubleChestAndMove(colourpowder, powderslot, ai) == false) {
-            ai.closeContainer();
-            return false;
-
+        for (int slot = 0; slot <= 53; slot++) {
+            if (Main.self.getInventory().getSlot(slot) != null
+                    && Main.self.getInventory().getSlot(slot).getType() == colourpowder) {
+                ai.swapItems(slot, powderslot);
+            }
         }
 
         ai.closeContainer();

@@ -12,7 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.server.NBTTagCompound;
 import zedly.zbot.BlockFace;
-import zedly.zbot.ConcurrentLinkedQueue;
+
 import zedly.zbot.Location;
 import zedly.zbot.Material;
 import zedly.zbot.environment.Block;
@@ -585,6 +585,30 @@ public class KaiTools {
             }, 1000);
             Main.self.getInventory().click(0, 1, 0);
             fillTesseract(tessdone.getLocation());
+            ai.tick();
+            debug++;
+        }
+    }
+    public static void CraftFullBlockSuper(String recipeId, Material matvor, Location tessvor, Location tessdone, Location craft, BlockingAI ai) throws InterruptedException {
+        int debug =0;
+        fillTesseract(tessvor);
+        ai.openContainer(craft);
+        Main.self.recipeBookStatus(true, false, true, false, true, false, true, false);
+        while (true) {
+            fillTesseract(tessvor);
+//            if (debug ==30){
+//                fillTesseract(tessvor);
+//            }
+            int slotsToGet = 11 - InventoryUtil.countFullStacks(matvor, 10, 45);
+            for (int i = 0; i < slotsToGet; i++) {
+                Main.self.clickBlock(tessvor);
+            }
+            Main.self.requestRecipe(recipeId, true);
+            ai.waitForEvent(SlotUpdateEvent.class, (e) -> {
+                return e.getSlotId() == 0;
+            }, 1000);
+            Main.self.getInventory().click(0, 1, 0);
+            fillTesseract(tessdone);
             ai.tick();
             debug++;
         }

@@ -7,7 +7,6 @@ package konni.konniskot.BotEdit;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jdk.nashorn.internal.ir.ContinueNode;
 import konni.konniskot.InventoryUtil;
 import konni.konniskot.KaiTools;
 import konni.konniskot.Main;

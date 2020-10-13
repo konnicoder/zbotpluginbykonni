@@ -25,8 +25,9 @@ public class TaskFloorSL extends Task {
     int y2;
     int z2;
 
-    int blockslot;
-    int toolslot;
+    int blockslot = 0;
+    int toolslot = 1;
+    boolean zenchantmentsactive = false;
 
     public TaskFloorSL(int x1, int y1, int z1, int x2, int y2, int z2) {
         super(30);
@@ -40,10 +41,10 @@ public class TaskFloorSL extends Task {
     }
 
     public void run() {
-        System.out.println("Starting TaskFloor");
-        Main.self.selectSlot(1);
+        System.out.println("Starting TaskFloorSL");
+        Main.self.selectSlot(toolslot);
         try {
-            for (int xachse = x1; xachse > x2; xachse = xachse - 4) {
+            for (int xachse = x1; xachse >= x2; xachse = xachse - 4) {
                 Location walk1 = new Location(xachse, y1 + 1, z1).centerHorizontally();
                 ai.navigateTo(walk1);
 
@@ -57,9 +58,23 @@ public class TaskFloorSL extends Task {
                             }
                         }
                     }
-                    Main.self.sneak(true);
-                    Main.self.placeBlock(xachse, y1, zachse, BlockFace.EAST);
-                    Main.self.sneak(false);
+                    if (zenchantmentsactive == true) {
+                        Main.self.selectSlot(toolslot);
+                        Main.self.sneak(true);
+                        Main.self.placeBlock(xachse, y1, zachse, BlockFace.EAST);
+                        Main.self.sneak(false);
+                    } else {
+                        Main.self.selectSlot(toolslot);
+                        if (Main.self.getEnvironment().getBlockAt(xachse, y1, zachse).getType() == Material.IRON_BLOCK) {
+                            Location loc = new Location(xachse, y1, zachse);
+                            Main.self.selectSlot(toolslot);
+                            ai.mineBlock(loc);
+                            ai.tick();
+                            Main.self.selectSlot(blockslot);
+                            Main.self.placeBlock(xachse, y1, zachse, BlockFace.EAST);
+                        }
+                    }
+
                     Location walk = new Location(xachse, y1 + 1, zachse).centerHorizontally();
                     ai.moveTo(walk);
                 }
@@ -69,5 +84,7 @@ public class TaskFloorSL extends Task {
 
         } catch (InterruptedException ex) {
         }
+        unregister();
     }
+
 }

@@ -29,11 +29,13 @@ import konni.konniskot.BotEdit.TaskFillFloor;
 import konni.konniskot.BotEdit.TaskPyramid;
 import konni.konniskot.BotEdit.TaskPyramidBFS;
 import konni.konniskot.BotEdit.TaskWallUp;
+import konni.konniskot.CraftingTasks.TaskCraftDj;
 import konni.konniskot.FarmTasks.TaskFarmPigmen;
 import konni.konniskot.FarmTasks.TaskFarmShulkerShells;
 import konni.konniskot.FarmTasks.TaskFarmWitherSkelletons;
 import konni.konniskot.FarmTasks.TaskMineEndPillars;
 import konni.konniskot.FarmTasks.TaskMineOres;
+import konni.konniskot.CraftingTasks.TaskCraftIron;
 import zedly.zbot.BlockFace;
 
 /**
@@ -126,6 +128,14 @@ class CommandProcessor {
                     new TaskStripMineReal(dis).start();
                 }
                 break;
+            case "craft_iron":
+                new TaskCraftIron().start();
+                break;
+
+            case "craft_dj":
+                new TaskCraftDj().start();
+                break;
+
             case "carrot":
                 new TaskCarrotFarmer().start();
                 break;
@@ -372,7 +382,7 @@ class CommandProcessor {
     }
 
     private static void loadComplimentsDictionary() {
-        try (BufferedReader br = new BufferedReader(new FileReader(scrambleComplimentFile))) {
+        try ( BufferedReader br = new BufferedReader(new FileReader(scrambleComplimentFile))) {
             String t;
             while ((t = br.readLine()) != null) {
                 compliments.add(t);
@@ -383,7 +393,7 @@ class CommandProcessor {
     }
 
     private static void loadInsultsDictionary() {
-        try (BufferedReader br = new BufferedReader(new FileReader(scrambleInsultsFile))) {
+        try ( BufferedReader br = new BufferedReader(new FileReader(scrambleInsultsFile))) {
             String t;
             while ((t = br.readLine()) != null) {
                 insults.add(t);

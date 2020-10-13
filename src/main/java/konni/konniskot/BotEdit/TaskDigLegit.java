@@ -26,7 +26,17 @@ import zedly.zbot.inventory.ItemStack;
  * @author Konstantin
  */
 public class TaskDigLegit extends Task {
-//          msg Edwin_Hubble__ di 594 32 -7990 523 45 -7831 16
+    
+    int pickaxeslot = 0;
+    int shovelslot = 1;
+    int axeslot = 2;
+    int blockslot = 3;
+    int swordslot = 4;
+    int foodslot = 8;
+
+    int backupslot = 9;
+
+//      bj di 667 43 -7969 596 43 -7831 11
 
     private static final Location TRASH_CHEST_LOC = new Location(298, 137, -8701).centerHorizontally();
     private static final Location TRASH_WALK_LOC = new Location(299, 137, -8701).centerHorizontally();
@@ -51,16 +61,9 @@ public class TaskDigLegit extends Task {
     private static final HashSet<Material> nonusables = new HashSet<>();
     private static final HashSet<Material> shovelables = new HashSet<>();
     private static final HashSet<Material> dangerous = new HashSet<>();
+    private static final HashSet<Material> nonbreakables = new HashSet<>();
     private static final HashSet<EntityType> enemies = new HashSet<>();
-    int pickaxeslot = 0;
-    int shovelslot = 1;
-    int axeslot = 2;
-    int blockslot = 3;
-    int swordslot = 4;
-    int foodslot = 8;
-
-    int backupslot = 9;
-
+    
     public TaskDigLegit(int x1, int y1, int z1, int x2, int y2, int z2, int targetheight) {
         super(10);
         X = x1;
@@ -142,6 +145,16 @@ public class TaskDigLegit extends Task {
 
                         Location walkloc = new Location(xachsenpunkt - 1, Main.self.getLocation().getBlockY(), Z);
                         ai.moveTo(walkloc);
+                        ai.tick(10);
+                        if (Main.self.getFoodLevel() < 20) {
+                            System.out.println("eating");
+                            Main.self.sendChat("/msg Konni999 eating");
+                            Main.self.selectSlot(foodslot);
+                            ai.eat(0);
+                            ai.tick(10);
+
+                            ai.tick(20);
+                        }
                     }
 
                 }
@@ -252,7 +265,7 @@ public class TaskDigLegit extends Task {
     }
 
     public boolean getNewTool() throws InterruptedException {
-        Main.self.sendChat("Toolhealth low, searching for new tool");
+        //Main.self.sendChat("Toolhealth low, searching for new tool");
 
         for (int slot = 9; slot < 44; slot++) {
             if (slot == 36) {
@@ -306,11 +319,14 @@ public class TaskDigLegit extends Task {
     }
 
     public void checkFood() throws InterruptedException {
+
         if (Main.self.getFoodLevel() < 20) {
             System.out.println("eating");
             Main.self.selectSlot(foodslot);
             ai.eat(0);
-            ai.tick();
+            ai.tick(10);
+
+            ai.tick(20);
         }
     }
 
@@ -343,7 +359,7 @@ public class TaskDigLegit extends Task {
     }
 
     public void goSleep() throws InterruptedException {
-        Main.self.sendChat("going to Bed, pls type /afk so that we can skip the night!");
+        //Main.self.sendChat("going to Bed, pls type /afk so that we can skip the night!");
         ai.tick(3);
         ai.moveTo(BED_WALK);
         ai.tick(60);
@@ -491,6 +507,8 @@ public class TaskDigLegit extends Task {
     }
 
     static {
+        nonbreakables.add(Material.SPAWNER);
+        nonbreakables.add(Material.BEACON);
         enemies.add(EntityType.SLIME);
         enemies.add(EntityType.CREEPER);
         enemies.add(EntityType.SKELETON);

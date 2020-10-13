@@ -75,8 +75,8 @@ public class InventoryUtil {
         }
         return count;
     }
-    
-    public static int countFullStacks(Material mat,int startslot, int endslot) {
+
+    public static int countFullStacks(Material mat, int startslot, int endslot) {
         int fullstacks = 0;
         for (int slot = startslot; slot <= endslot; slot++) {
             if (Main.self.getInventory().getSlot(slot) != null && Main.self.getInventory().getSlot(slot).getType() == mat && Main.self.getInventory().getSlot(slot).getAmount() == 64) {
@@ -103,7 +103,7 @@ public class InventoryUtil {
         }
         return -1;
     }
-    
+
     public static int countFreeStorageSlots(boolean testStatic, boolean testExternal) {
         int count = 0;
         int staticOffset = Main.self.getInventory().getStaticOffset();
@@ -123,6 +123,18 @@ public class InventoryUtil {
                 }
             }
         }
+        return count;
+    }
+
+    public static int countFreeSlotsInShulker() {
+        int count = 0;
+        for (int slot = 0; slot <= 26; slot++) {
+            ItemStack is = Main.self.getInventory().getSlot(slot);
+            if (is == null) {
+                count++;
+            }
+        }
+
         return count;
     }
 }
